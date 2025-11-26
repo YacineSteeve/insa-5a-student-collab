@@ -1,6 +1,7 @@
 package com.blyweertboukari.studentcollab.student.dto;
 
 import com.blyweertboukari.studentcollab.student.model.Student;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,13 +9,14 @@ import lombok.NoArgsConstructor;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import org.hibernate.validator.constraints.UniqueElements;
+
 import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class StudentRegistrationDTO {
-
+public class RegistrationDTO {
     @NotBlank(message = "Last name is required")
     private String lastName;
 
@@ -35,9 +37,11 @@ public class StudentRegistrationDTO {
     @NotBlank(message = "Major is required")
     private Student.Major major;
 
+    @UniqueElements(message = "Each skill must be unique")
+    @Size(min = 1, message = "At least one skill is required")
     private List<String> skills;
+
+    @UniqueElements(message = "Each availability must be unique")
+    @Size(min = 1, message = "At least one availability is required")
     private List<String> availabilities;
-    private Double averageReview;
-
-
 }

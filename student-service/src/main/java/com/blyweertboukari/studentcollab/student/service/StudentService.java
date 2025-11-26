@@ -83,17 +83,17 @@ public class StudentService {
                 .collect(Collectors.toList());
     }
 
-    public List<StudentDTO> getStudentsByCompetence(String competence) {
-        return studentRepository.findBySkillsContaining(competence).stream()
+    public List<StudentDTO> getStudentsBySkill(String skill) {
+        return studentRepository.findBySkillsContaining(skill).stream()
                 .map(this::toDTO)
                 .collect(Collectors.toList());
     }
 
-    public List<StudentDTO> getStudentsByFiliere(String filiere) {
+    public List<StudentDTO> getStudentsByMajor(String major) {
         // Attempt to map string to enum; fallback to all if invalid
         try {
-            Student.Major major = Student.Major.valueOf(filiere.toUpperCase());
-            return studentRepository.findByMajor(major).stream()
+            Student.Major major_ = Student.Major.valueOf(major.toUpperCase());
+            return studentRepository.findByMajor(major_).stream()
                     .map(this::toDTO)
                     .collect(Collectors.toList());
         } catch (IllegalArgumentException ex) {

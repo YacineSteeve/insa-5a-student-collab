@@ -37,7 +37,10 @@ public class HelpRequest {
     private String description;
 
     @Column(nullable = false)
-    private Long studentId;
+    private Long authorId;
+
+    @Column()
+    private Long assigneeId;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

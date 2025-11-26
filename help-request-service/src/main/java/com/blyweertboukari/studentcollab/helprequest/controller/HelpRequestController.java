@@ -71,10 +71,10 @@ public class HelpRequestController {
         return ResponseEntity.ok(helpRequests);
     }
 
-    @GetMapping("/student/{studentId}")
-    @Operation(summary = "Get Help Request By Student ID")
-    public ResponseEntity<List<HelpRequestCreationDTO>> getHelpRequestsByStudent(@PathVariable Long studentId) {
-        List<HelpRequestCreationDTO> helpRequests = helpRequestService.getHelpRequestsByStudent(studentId);
+    @GetMapping("/me")
+    @Operation(summary = "Get Help Request For Authenticated User")
+    public ResponseEntity<List<HelpRequestCreationDTO>> getHelpRequestsForAuthenticatedUser() {
+        List<HelpRequestCreationDTO> helpRequests = helpRequestService.getHelpRequestsForAuthenticatedUser();
         return ResponseEntity.ok(helpRequests);
     }
 

@@ -1,7 +1,6 @@
 package com.blyweertboukari.studentcollab.student.dto;
 
 import com.blyweertboukari.studentcollab.student.model.Student;
-import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

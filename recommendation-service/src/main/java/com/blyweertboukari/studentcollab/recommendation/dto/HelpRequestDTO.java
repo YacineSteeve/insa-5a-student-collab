@@ -5,7 +5,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,7 +15,7 @@ public class HelpRequestDTO {
 
     private Long id;
     private Long studentId;
-    private String titre;
+    private String title;
     private String description;
     private List<String> keywords = new ArrayList<>();
     private Instant createdAt;

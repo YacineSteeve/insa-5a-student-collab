@@ -8,12 +8,15 @@ import com.blyweertboukari.studentcollab.student.model.Student;
 import com.blyweertboukari.studentcollab.student.service.AuthenticationService;
 import com.blyweertboukari.studentcollab.student.service.JwtService;
 import com.blyweertboukari.studentcollab.student.service.StudentService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
+@Tag(name = "Authentication", description = "Authentication API")
 public class AuthenticationController {
     @Autowired
     private JwtService jwtService;
@@ -23,6 +26,7 @@ public class AuthenticationController {
     private StudentService studentService;
 
     @PostMapping("/signup")
+    @Operation(summary = "Register Student")
     public ResponseEntity<StudentDTO> register(@RequestBody RegistrationDTO registrationDTO) {
         Student student = authenticationService.signup(registrationDTO);
 
@@ -32,6 +36,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/login")
+    @Operation(summary = "Log Student In")
     public ResponseEntity<LoginResponse> authenticate(@RequestBody LoginDTO loginDTO) {
         Student authenticatedStudent = authenticationService.authenticate(loginDTO);
 

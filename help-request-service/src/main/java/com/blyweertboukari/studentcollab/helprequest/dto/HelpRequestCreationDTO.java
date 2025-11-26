@@ -32,6 +32,6 @@ public class HelpRequestCreationDTO {
     @NotEmpty(message = "Keywords must not be empty")
     private List<String> keywords = new ArrayList<>();
 
-    // Optional desired date/time for the help session
+    @NotNull(message = "Desired date is required")
     private Instant desiredDate;
 }

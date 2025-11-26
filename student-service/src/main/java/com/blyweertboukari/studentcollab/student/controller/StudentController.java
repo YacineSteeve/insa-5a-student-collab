@@ -2,6 +2,8 @@ package com.blyweertboukari.studentcollab.student.controller;
 
 import com.blyweertboukari.studentcollab.student.dto.StudentDTO;
 import com.blyweertboukari.studentcollab.student.service.StudentService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,11 +16,13 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/students")
+@Tag(name = "Students", description = "Student API")
 public class StudentController {
     @Autowired
     private StudentService studentService;
 
     @GetMapping("/me")
+    @Operation(summary = "Get authenticated Student")
     public ResponseEntity<StudentDTO> authenticatedStudent() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -28,6 +32,7 @@ public class StudentController {
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Get Student By ID")
     public ResponseEntity<StudentDTO> getStudent(@PathVariable Long id) {
         try {
             StudentDTO student = studentService.getStudentById(id);
@@ -38,6 +43,7 @@ public class StudentController {
     }
 
     @PutMapping("/{id}")
+    @Operation(summary = "Update Student By ID")
     public ResponseEntity<StudentDTO> updateStudent(@PathVariable Long id, @Valid @RequestBody StudentDTO studentDTO) {
         try {
             StudentDTO student = studentService.updateStudent(id, studentDTO);
@@ -48,6 +54,7 @@ public class StudentController {
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "Delete Student By ID")
     public ResponseEntity<Void> deleteStudent(@PathVariable Long id) {
         try {
             studentService.deleteStudent(id);
@@ -58,20 +65,23 @@ public class StudentController {
     }
 
     @GetMapping
+    @Operation(summary = "Get All Students")
     public ResponseEntity<List<StudentDTO>> getAllStudents() {
         List<StudentDTO> students = studentService.getAllStudents();
         return ResponseEntity.ok(students);
     }
 
-    @GetMapping("/competence/{competence}")
-    public ResponseEntity<List<StudentDTO>> getStudentsByCompetence(@PathVariable String competence) {
-        List<StudentDTO> students = studentService.getStudentsByCompetence(competence);
+    @GetMapping("/skill/{skill}")
+    @Operation(summary = "Get Students By Skill")
+    public ResponseEntity<List<StudentDTO>> getStudentsBySkill(@PathVariable String skill) {
+        List<StudentDTO> students = studentService.getStudentsBySkill(skill);
         return ResponseEntity.ok(students);
     }
 
-    @GetMapping("/filiere/{filiere}")
-    public ResponseEntity<List<StudentDTO>> getStudentsByFiliere(@PathVariable String filiere) {
-        List<StudentDTO> students = studentService.getStudentsByFiliere(filiere);
+    @GetMapping("/major/{major}")
+    @Operation(summary = "Get Students By Major")
+    public ResponseEntity<List<StudentDTO>> getStudentsByMajor(@PathVariable String major) {
+        List<StudentDTO> students = studentService.getStudentsByMajor(major);
         return ResponseEntity.ok(students);
     }
 }

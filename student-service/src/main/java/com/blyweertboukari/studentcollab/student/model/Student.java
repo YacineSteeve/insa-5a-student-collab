@@ -52,12 +52,12 @@ public class Student {
     private List<Review> reviews = new ArrayList<>();
     
     @Transient
-    public Double getAverageReview() {
+    public Double getAverageRating() {
         if (reviews == null || reviews.isEmpty()) {
             return 0.0;
         }
         return reviews.stream()
-                .mapToInt(Review::getScore)
+                .mapToInt(Review::getRating)
                 .average()
                 .orElse(0.0);
     }

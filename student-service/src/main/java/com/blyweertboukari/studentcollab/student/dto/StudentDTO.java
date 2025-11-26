@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.util.List;
 
 @Data
@@ -28,11 +29,11 @@ public class StudentDTO {
     @NotBlank(message = "Establishment is required")
     private String establishment;
 
-    @NotBlank(message = "Major is required")
+    @NotNull(message = "Major is required")
     private Student.Major major;
 
     private List<String> skills;
     private List<String> availabilities;
-    private Double averageReview;
+    private Double averageRating;
 
 }

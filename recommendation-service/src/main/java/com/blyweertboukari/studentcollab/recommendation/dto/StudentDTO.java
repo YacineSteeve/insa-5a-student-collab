@@ -18,8 +18,7 @@ public class StudentDTO {
     private Major major;
     private List<String> skills;
     private List<String> availabilities;
-    private Double averageReview;
-
+    private Double averageRating;
 
     public enum Major {
         COMPUTER_SCIENCE,

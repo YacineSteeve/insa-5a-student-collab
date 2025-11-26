@@ -17,11 +17,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class HelpRequestCreationDTO {
-    private Long id;
-
-    @NotNull(message = "Student ID is required")
-    private Long studentId;
-
     @NotBlank(message = "The title is required")
     private String title;
 

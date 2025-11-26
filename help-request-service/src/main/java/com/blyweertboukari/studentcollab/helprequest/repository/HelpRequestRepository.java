@@ -9,6 +9,6 @@ import java.util.List;
 @Repository
 public interface HelpRequestRepository extends JpaRepository<HelpRequest, Long> {
     List<HelpRequest> findByStudentId(Long studentId);
-    List<HelpRequest> findByStatus(HelpRequest.Status statut);
+    List<HelpRequest> findByStatus(HelpRequest.Status status);
     List<HelpRequest> findByKeywordsContaining(String keyword);
 }

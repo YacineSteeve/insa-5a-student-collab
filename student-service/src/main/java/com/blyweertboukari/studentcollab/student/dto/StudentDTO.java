@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import java.util.List;
 
 @Data
@@ -14,20 +13,20 @@ import java.util.List;
 @AllArgsConstructor
 public class StudentDTO {
     private Long id;
-    
+
     @NotBlank(message = "Le nom est obligatoire")
     private String nom;
-    
+
     @NotBlank(message = "L'email est obligatoire")
     @Email(message = "L'email doit être valide")
     private String email;
-    
+
     @NotBlank(message = "L'établissement est obligatoire")
     private String etablissement;
-    
+
     @NotBlank(message = "La filière est obligatoire")
     private String filiere;
-    
+
     private List<String> competences;
     private List<String> disponibilites;
     private Double moyenneAvis;

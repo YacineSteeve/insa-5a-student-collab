@@ -1,12 +1,11 @@
 package com.blyweertboukari.studentcollab.recommendation.service;
 
-import com.blyweertboukari.studentcollab.recommendation.client.HelpRequestClient;
-import com.blyweertboukari.studentcollab.recommendation.client.StudentClient;
 import com.blyweertboukari.studentcollab.recommendation.dto.HelpRequestDTO;
 import com.blyweertboukari.studentcollab.recommendation.dto.RecommendationDTO;
 import com.blyweertboukari.studentcollab.recommendation.dto.StudentDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -17,14 +16,14 @@ import java.util.stream.Collectors;
 public class RecommendationService {
     
     @Autowired
-    private StudentClient studentClient;
+    private StudentService studentService;
     
     @Autowired
-    private HelpRequestClient helpRequestClient;
+    private HelpRequestService helpRequestService;
     
     public List<RecommendationDTO> recommendStudentsForHelpRequest(Long helpRequestId) {
-        HelpRequestDTO helpRequest = helpRequestClient.getHelpRequestById(helpRequestId);
-        List<StudentDTO> allStudents = studentClient.getAllStudents();
+        HelpRequestDTO helpRequest = helpRequestService.getHelpRequestById(helpRequestId);
+        List<StudentDTO> allStudents = studentService.getAllStudents();
         
         List<RecommendationDTO> recommendations = new ArrayList<>();
         

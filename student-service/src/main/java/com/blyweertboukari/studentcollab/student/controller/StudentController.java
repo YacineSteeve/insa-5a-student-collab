@@ -1,6 +1,7 @@
 package com.blyweertboukari.studentcollab.student.controller;
 
 import com.blyweertboukari.studentcollab.student.dto.StudentDTO;
+import com.blyweertboukari.studentcollab.student.exceptions.NotFoundException;
 import com.blyweertboukari.studentcollab.student.service.StudentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -24,11 +25,15 @@ public class StudentController {
     @GetMapping("/me")
     @Operation(summary = "Get authenticated Student")
     public ResponseEntity<StudentDTO> authenticatedStudent() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        StudentDTO currentStudent = (StudentDTO) authentication.getPrincipal();
+            StudentDTO currentStudent = (StudentDTO) authentication.getPrincipal();
 
-        return ResponseEntity.ok(currentStudent);
+            return ResponseEntity.ok(currentStudent);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @GetMapping("/{id}")
@@ -37,8 +42,10 @@ public class StudentController {
         try {
             StudentDTO student = studentService.getStudentById(id);
             return ResponseEntity.ok(student);
-        } catch (RuntimeException e) {
+        } catch (NotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
@@ -68,20 +75,6 @@ public class StudentController {
     @Operation(summary = "Get All Students")
     public ResponseEntity<List<StudentDTO>> getAllStudents() {
         List<StudentDTO> students = studentService.getAllStudents();
-        return ResponseEntity.ok(students);
-    }
-
-    @GetMapping("/skill/{skill}")
-    @Operation(summary = "Get Students By Skill")
-    public ResponseEntity<List<StudentDTO>> getStudentsBySkill(@PathVariable String skill) {
-        List<StudentDTO> students = studentService.getStudentsBySkill(skill);
-        return ResponseEntity.ok(students);
-    }
-
-    @GetMapping("/major/{major}")
-    @Operation(summary = "Get Students By Major")
-    public ResponseEntity<List<StudentDTO>> getStudentsByMajor(@PathVariable String major) {
-        List<StudentDTO> students = studentService.getStudentsByMajor(major);
         return ResponseEntity.ok(students);
     }
 }

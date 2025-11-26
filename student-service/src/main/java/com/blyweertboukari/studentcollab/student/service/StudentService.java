@@ -3,6 +3,7 @@ package com.blyweertboukari.studentcollab.student.service;
 import com.blyweertboukari.studentcollab.student.dto.LoginDTO;
 import com.blyweertboukari.studentcollab.student.dto.RegistrationDTO;
 import com.blyweertboukari.studentcollab.student.dto.StudentDTO;
+import com.blyweertboukari.studentcollab.student.exceptions.NotFoundException;
 import com.blyweertboukari.studentcollab.student.model.Student;
 import com.blyweertboukari.studentcollab.student.repository.StudentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,7 +52,7 @@ public class StudentService {
 
     public StudentDTO getStudentById(Long id) {
         Student student = studentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Student not found"));
+                .orElseThrow(() -> new NotFoundException("Student not found"));
         return toDTO(student);
     }
 

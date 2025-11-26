@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.Instant;
 import java.util.List;
 
 @Data
@@ -19,7 +20,9 @@ public class StudentDTO {
     private List<String> skills;
     private List<String> availabilities;
     private Double averageReview;
-
+    private Instant createdAt;
+    private Instant updatedAt;
+    
     public enum Major {
         COMPUTER_SCIENCE,
         MATHEMATICS,

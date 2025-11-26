@@ -1,6 +1,7 @@
 package com.blyweertboukari.studentcollab.helprequest.service;
 
 import com.blyweertboukari.studentcollab.helprequest.dto.HelpRequestCreationDTO;
+import com.blyweertboukari.studentcollab.helprequest.dto.HelpRequestDTO;
 import com.blyweertboukari.studentcollab.helprequest.dto.StudentDTO;
 import com.blyweertboukari.studentcollab.helprequest.exceptions.NotFoundException;
 import com.blyweertboukari.studentcollab.helprequest.model.HelpRequest;
@@ -21,15 +22,16 @@ public class HelpRequestService {
     @Autowired
     private StudentService studentService;
 
-    public HelpRequestCreationDTO createHelpRequest(HelpRequestCreationDTO dto) {
-        StudentDTO studentDTO = studentService.getStudentById(dto.getStudentId());
+    public HelpRequestDTO createHelpRequest(HelpRequestCreationDTO dto) {
+        long studentId = 1;
+        StudentDTO studentDTO = studentService.getStudentById(studentId);
 
         if (studentDTO == null) {
             throw new NotFoundException("Student not found");
         }
 
         HelpRequest helpRequest = new HelpRequest();
-        helpRequest.setStudentId(studentDTO.getId());
+        helpRequest.setAuthorId(studentDTO.getId());
         helpRequest.setTitle(dto.getTitle());
         helpRequest.setDescription(dto.getDescription());
         helpRequest.setKeywords(dto.getKeywords());
@@ -40,13 +42,13 @@ public class HelpRequestService {
         return toDTO(helpRequest);
     }
 
-    public HelpRequestCreationDTO getHelpRequestById(Long id) {
+    public HelpRequestDTO getHelpRequestById(Long id) {
         HelpRequest helpRequest = helpRequestRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Help request not found"));
         return toDTO(helpRequest);
     }
 
-    public HelpRequestCreationDTO updateHelpRequest(Long id, HelpRequestCreationDTO dto) {
+    public HelpRequestDTO updateHelpRequest(Long id, HelpRequestCreationDTO dto) {
         HelpRequest helpRequest = helpRequestRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Help request not found"));
 
@@ -59,7 +61,7 @@ public class HelpRequestService {
         return toDTO(helpRequest);
     }
 
-    public HelpRequestCreationDTO updateStatus(Long id, HelpRequest.Status status) {
+    public HelpRequestDTO updateStatus(Long id, HelpRequest.Status status) {
         HelpRequest helpRequest = helpRequestRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Help request not found"));
 
@@ -75,38 +77,43 @@ public class HelpRequestService {
         helpRequestRepository.deleteById(id);
     }
 
-    public List<HelpRequestCreationDTO> getAllHelpRequests() {
+    public List<HelpRequestDTO> getAllHelpRequests() {
         return helpRequestRepository.findAll().stream()
                 .map(this::toDTO)
                 .collect(Collectors.toList());
     }
 
-    public List<HelpRequestCreationDTO> getHelpRequestsByStudent(Long studentId) {
+    public List<HelpRequestDTO> getHelpRequestsForAuthenticatedUser() {
+        long studentId = 1;
         return helpRequestRepository.findByStudentId(studentId).stream()
                 .map(this::toDTO)
                 .collect(Collectors.toList());
     }
 
-    public List<HelpRequestCreationDTO> getHelpRequestsByStatus(HelpRequest.Status status) {
+    public List<HelpRequestDTO> getHelpRequestsByStatus(HelpRequest.Status status) {
         return helpRequestRepository.findByStatus(status).stream()
                 .map(this::toDTO)
                 .collect(Collectors.toList());
     }
 
-    public List<HelpRequestCreationDTO> getHelpRequestsByKeyword(String keyword) {
+    public List<HelpRequestDTO> getHelpRequestsByKeyword(String keyword) {
         return helpRequestRepository.findByKeywordsContaining(keyword).stream()
                 .map(this::toDTO)
                 .collect(Collectors.toList());
     }
 
-    private HelpRequestCreationDTO toDTO(HelpRequest helpRequest) {
-        HelpRequestCreationDTO dto = new HelpRequestCreationDTO();
+    private HelpRequestDTO toDTO(HelpRequest helpRequest) {
+        HelpRequestDTO dto = new HelpRequestDTO();
         dto.setId(helpRequest.getId());
-        dto.setStudentId(helpRequest.getStudentId());
+        dto.setStatus(helpRequest.getStatus());
+        dto.setAssigneeId(helpRequest.getAssigneeId());
+        dto.setAuthorId(helpRequest.getAuthorId());
         dto.setTitle(helpRequest.getTitle());
         dto.setDescription(helpRequest.getDescription());
         dto.setKeywords(helpRequest.getKeywords());
         dto.setDesiredDate(helpRequest.getDesiredDate());
+        dto.setCreatedAt(helpRequest.getCreatedAt());
+        dto.setUpdatedAt(helpRequest.getUpdatedAt());
         return dto;
     }
 }

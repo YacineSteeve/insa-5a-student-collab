@@ -15,11 +15,13 @@ import java.util.List;
 @AllArgsConstructor
 public class HelpRequestDTO {
     private Long id;
-    private Long studentId;
+    private Long assigneeId;
+    private Long authorId;
     private String title;
     private String description;
     private List<String> keywords = new ArrayList<>();
     private Instant createdAt;
+    private Instant updatedAt;
     private Date desiredDate;
     private HelpRequest.Status status;
 }

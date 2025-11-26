@@ -1,13 +1,14 @@
 package com.blyweertboukari.studentcollab.helprequest.dto;
 
-import com.blyweertboukari.studentcollab.helprequest.model.HelpRequest;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import java.time.LocalDateTime;
+import org.hibernate.validator.constraints.UniqueElements;
+
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -15,20 +16,14 @@ import java.util.List;
 @AllArgsConstructor
 public class HelpRequestDTO {
     private Long id;
-    
-    @NotNull(message = "L'ID de l'étudiant est obligatoire")
-    private Long studentId;
-    
-    @NotBlank(message = "Le titre est obligatoire")
+
+    @NotBlank(message = "The title is required")
     private String titre;
-    
-    @NotBlank(message = "La description est obligatoire")
+
+    @NotBlank(message = "The description is required")
     private String description;
-    
-    private List<String> motsCles;
-    private LocalDateTime dateCreation;
-    private HelpRequest.StatutDemande statut;
-    
-    @NotNull(message = "Le type de demande est obligatoire")
-    private HelpRequest.TypeDemande type;
+
+    @UniqueElements(message = "Each keyword must be unique")
+    @NotEmpty(message = "Keywords must not be empty")
+    private List<String> keywords = new ArrayList<>();
 }

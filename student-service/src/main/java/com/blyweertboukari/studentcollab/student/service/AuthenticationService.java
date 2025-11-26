@@ -20,6 +20,10 @@ public class AuthenticationService {
     private AuthenticationManager authenticationManager;
 
     public Student signup(RegistrationDTO registrationDTO) {
+        if (studentRepository.existsByEmail(registrationDTO.getEmail())) {
+            throw new RuntimeException("A student with this email already exists");
+        }
+
         Student student = new Student();
         student.setEmail(registrationDTO.getEmail());
         student.setPassword(bCryptPasswordEncoder.encode(registrationDTO.getPassword()));

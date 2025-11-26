@@ -11,11 +11,25 @@ import java.util.List;
 @AllArgsConstructor
 public class StudentDTO {
     private Long id;
-    private String nom;
+    private String lastName;
+    private String firstName;
     private String email;
-    private String etablissement;
-    private String filiere;
-    private List<String> competences;
-    private List<String> disponibilites;
-    private Double moyenneAvis;
+    private String establishment;
+    private Major major;
+    private List<String> skills;
+    private List<String> availabilities;
+    private Double averageReview;
+
+    public enum Major {
+        COMPUTER_SCIENCE,
+        MATHEMATICS,
+        PHYSICS,
+        CHEMISTRY,
+        BIOLOGY,
+        ECONOMICS,
+        BUSINESS,
+        LITERATURE,
+        HISTORY,
+        ARTS
+    }
 }

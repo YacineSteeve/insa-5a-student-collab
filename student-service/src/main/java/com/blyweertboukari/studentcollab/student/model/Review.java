@@ -1,6 +1,8 @@
 package com.blyweertboukari.studentcollab.student.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -23,7 +25,9 @@ public class Review {
     private Student student;
 
     @Column(nullable = false)
-    private Integer score;
+    @Min(0)
+    @Max(5)
+    private Integer rating;
     
     @Column(length = 1000)
     private String comment;

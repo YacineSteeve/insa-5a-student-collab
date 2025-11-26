@@ -21,17 +21,18 @@ public class StudentService {
     
     public StudentDTO register(StudentRegistrationDTO registrationDTO) {
         if (studentRepository.existsByEmail(registrationDTO.getEmail())) {
-            throw new RuntimeException("Un étudiant avec cet email existe déjà");
+            throw new RuntimeException("A student with this email already exists");
         }
         
         Student student = new Student();
-        student.setNom(registrationDTO.getNom());
+        student.setLastName(registrationDTO.getLastName());
+        student.setFirstName(registrationDTO.getFirstName());
         student.setEmail(registrationDTO.getEmail());
         student.setPassword(registrationDTO.getPassword());
-        student.setEtablissement(registrationDTO.getEtablissement());
-        student.setFiliere(registrationDTO.getFiliere());
-        student.setCompetences(registrationDTO.getCompetences());
-        student.setDisponibilites(registrationDTO.getDisponibilites());
+        student.setEstablishment(registrationDTO.getEstablishment());
+        student.setMajor(registrationDTO.getMajor());
+        student.setSkills(registrationDTO.getSkills());
+        student.setAvailabilities(registrationDTO.getAvailabilities());
         
         student = studentRepository.save(student);
         return toDTO(student);
@@ -39,10 +40,10 @@ public class StudentService {
     
     public StudentDTO login(LoginDTO loginDTO) {
         Student student = studentRepository.findByEmail(loginDTO.getEmail())
-                .orElseThrow(() -> new RuntimeException("Email ou mot de passe incorrect"));
+                .orElseThrow(() -> new RuntimeException("Invalid email or password"));
         
         if (!student.getPassword().equals(loginDTO.getPassword())) {
-            throw new RuntimeException("Email ou mot de passe incorrect");
+            throw new RuntimeException("Invalid email or password");
         }
         
         return toDTO(student);
@@ -50,19 +51,20 @@ public class StudentService {
     
     public StudentDTO getStudentById(Long id) {
         Student student = studentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Étudiant non trouvé"));
+                .orElseThrow(() -> new RuntimeException("Student not found"));
         return toDTO(student);
     }
     
     public StudentDTO updateStudent(Long id, StudentDTO studentDTO) {
         Student student = studentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Étudiant non trouvé"));
+                .orElseThrow(() -> new RuntimeException("Student not found"));
         
-        student.setNom(studentDTO.getNom());
-        student.setEtablissement(studentDTO.getEtablissement());
-        student.setFiliere(studentDTO.getFiliere());
-        student.setCompetences(studentDTO.getCompetences());
-        student.setDisponibilites(studentDTO.getDisponibilites());
+        student.setLastName(studentDTO.getLastName());
+        student.setFirstName(studentDTO.getFirstName());
+        student.setEstablishment(studentDTO.getEstablishment());
+        student.setMajor(studentDTO.getMajor());
+        student.setSkills(studentDTO.getSkills());
+        student.setAvailabilities(studentDTO.getAvailabilities());
         
         student = studentRepository.save(student);
         return toDTO(student);
@@ -70,7 +72,7 @@ public class StudentService {
     
     public void deleteStudent(Long id) {
         if (!studentRepository.existsById(id)) {
-            throw new RuntimeException("Étudiant non trouvé");
+            throw new RuntimeException("Student not found");
         }
         studentRepository.deleteById(id);
     }
@@ -82,27 +84,34 @@ public class StudentService {
     }
     
     public List<StudentDTO> getStudentsByCompetence(String competence) {
-        return studentRepository.findByCompetencesContaining(competence).stream()
+        return studentRepository.findBySkillsContaining(competence).stream()
                 .map(this::toDTO)
                 .collect(Collectors.toList());
     }
     
     public List<StudentDTO> getStudentsByFiliere(String filiere) {
-        return studentRepository.findByFiliere(filiere).stream()
-                .map(this::toDTO)
-                .collect(Collectors.toList());
+        // Attempt to map string to enum; fallback to all if invalid
+        try {
+            Student.Major major = Student.Major.valueOf(filiere.toUpperCase());
+            return studentRepository.findByMajor(major).stream()
+                    .map(this::toDTO)
+                    .collect(Collectors.toList());
+        } catch (IllegalArgumentException ex) {
+            return List.of();
+        }
     }
     
     private StudentDTO toDTO(Student student) {
         StudentDTO dto = new StudentDTO();
         dto.setId(student.getId());
-        dto.setNom(student.getNom());
+        dto.setLastName(student.getLastName());
+        dto.setFirstName(student.getFirstName());
         dto.setEmail(student.getEmail());
-        dto.setEtablissement(student.getEtablissement());
-        dto.setFiliere(student.getFiliere());
-        dto.setCompetences(student.getCompetences());
-        dto.setDisponibilites(student.getDisponibilites());
-        dto.setMoyenneAvis(student.getMoyenneAvis());
+        dto.setEstablishment(student.getEstablishment());
+        dto.setMajor(student.getMajor());
+        dto.setSkills(student.getSkills());
+        dto.setAvailabilities(student.getAvailabilities());
+        dto.setAverageRating(student.getAverageRating());
         return dto;
     }
 }

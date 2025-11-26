@@ -1,13 +1,11 @@
 package com.blyweertboukari.studentcollab.helprequest.dto;
 
-import jakarta.validation.constraints.NotEmpty;
+import com.blyweertboukari.studentcollab.helprequest.model.HelpRequest;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import jakarta.validation.constraints.NotBlank;
-import org.hibernate.validator.constraints.UniqueElements;
-
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,14 +14,11 @@ import java.util.List;
 @AllArgsConstructor
 public class HelpRequestDTO {
     private Long id;
-
-    @NotBlank(message = "The title is required")
-    private String titre;
-
-    @NotBlank(message = "The description is required")
+    private Long studentId;
+    private String title;
     private String description;
-
-    @UniqueElements(message = "Each keyword must be unique")
-    @NotEmpty(message = "Keywords must not be empty")
     private List<String> keywords = new ArrayList<>();
+    private Instant createdAt;
+    private Instant desiredDate;
+    private HelpRequest.Status status;
 }

@@ -1,13 +1,12 @@
 package com.blyweertboukari.studentcollab.helprequest.service;
 
-import com.blyweertboukari.studentcollab.helprequest.dto.HelpRequestDTO;
+import com.blyweertboukari.studentcollab.helprequest.dto.HelpRequestCreationDTO;
 import com.blyweertboukari.studentcollab.helprequest.model.HelpRequest;
 import com.blyweertboukari.studentcollab.helprequest.repository.HelpRequestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,97 +16,85 @@ public class HelpRequestService {
     @Autowired
     private HelpRequestRepository helpRequestRepository;
 
-    @Autowired
-    private StudentService studentService;
-
-    public HelpRequestDTO createHelpRequest(HelpRequestDTO dto) {
+    public HelpRequestCreationDTO createHelpRequest(HelpRequestCreationDTO dto) {
         HelpRequest helpRequest = new HelpRequest();
         helpRequest.setStudentId(dto.getStudentId());
-        helpRequest.setTitre(dto.getTitre());
+        helpRequest.setTitle(dto.getTitle());
         helpRequest.setDescription(dto.getDescription());
-        helpRequest.setMotsCles(dto.getMotsCles());
-        helpRequest.setType(dto.getType());
-        helpRequest.setDateCreation(LocalDateTime.now());
-        helpRequest.setStatut(HelpRequest.StatutDemande.EN_ATTENTE);
+        helpRequest.setKeywords(dto.getKeywords());
+        helpRequest.setDesiredDate(dto.getDesiredDate());
 
         helpRequest = helpRequestRepository.save(helpRequest);
         return toDTO(helpRequest);
     }
 
-    public HelpRequestDTO getHelpRequestById(Long id) {
+    public HelpRequestCreationDTO getHelpRequestById(Long id) {
         HelpRequest helpRequest = helpRequestRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Demande non trouvée"));
+                .orElseThrow(() -> new RuntimeException("Help request not found"));
         return toDTO(helpRequest);
     }
 
-    public HelpRequestDTO updateHelpRequest(Long id, HelpRequestDTO dto) {
+    public HelpRequestCreationDTO updateHelpRequest(Long id, HelpRequestCreationDTO dto) {
         HelpRequest helpRequest = helpRequestRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Demande non trouvée"));
+                .orElseThrow(() -> new RuntimeException("Help request not found"));
 
-        helpRequest.setTitre(dto.getTitre());
+        helpRequest.setTitle(dto.getTitle());
         helpRequest.setDescription(dto.getDescription());
-        helpRequest.setMotsCles(dto.getMotsCles());
+        helpRequest.setKeywords(dto.getKeywords());
+        helpRequest.setDesiredDate(dto.getDesiredDate());
 
         helpRequest = helpRequestRepository.save(helpRequest);
         return toDTO(helpRequest);
     }
 
-    public HelpRequestDTO updateStatus(Long id, HelpRequest.StatutDemande statut) {
+    public HelpRequestCreationDTO updateStatus(Long id, HelpRequest.Status status) {
         HelpRequest helpRequest = helpRequestRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Demande non trouvée"));
+                .orElseThrow(() -> new RuntimeException("Help request not found"));
 
-        helpRequest.setStatut(statut);
+        helpRequest.setStatus(status);
         helpRequest = helpRequestRepository.save(helpRequest);
         return toDTO(helpRequest);
     }
 
     public void deleteHelpRequest(Long id) {
         if (!helpRequestRepository.existsById(id)) {
-            throw new RuntimeException("Demande non trouvée");
+            throw new RuntimeException("Help request not found");
         }
         helpRequestRepository.deleteById(id);
     }
 
-    public List<HelpRequestDTO> getAllHelpRequests() {
+    public List<HelpRequestCreationDTO> getAllHelpRequests() {
         return helpRequestRepository.findAll().stream()
                 .map(this::toDTO)
                 .collect(Collectors.toList());
     }
 
-    public List<HelpRequestDTO> getHelpRequestsByStudent(Long studentId) {
+    public List<HelpRequestCreationDTO> getHelpRequestsByStudent(Long studentId) {
         return helpRequestRepository.findByStudentId(studentId).stream()
                 .map(this::toDTO)
                 .collect(Collectors.toList());
     }
 
-    public List<HelpRequestDTO> getHelpRequestsByStatus(HelpRequest.StatutDemande statut) {
-        return helpRequestRepository.findByStatut(statut).stream()
+    public List<HelpRequestCreationDTO> getHelpRequestsByStatus(HelpRequest.Status status) {
+        return helpRequestRepository.findByStatus(status).stream()
                 .map(this::toDTO)
                 .collect(Collectors.toList());
     }
 
-    public List<HelpRequestDTO> getHelpRequestsByType(HelpRequest.TypeDemande type) {
-        return helpRequestRepository.findByType(type).stream()
+    public List<HelpRequestCreationDTO> getHelpRequestsByKeyword(String keyword) {
+        return helpRequestRepository.findByKeywordsContaining(keyword).stream()
                 .map(this::toDTO)
                 .collect(Collectors.toList());
     }
 
-    public List<HelpRequestDTO> getHelpRequestsByKeyword(String keyword) {
-        return helpRequestRepository.findByMotsClesContaining(keyword).stream()
-                .map(this::toDTO)
-                .collect(Collectors.toList());
-    }
-
-    private HelpRequestDTO toDTO(HelpRequest helpRequest) {
-        HelpRequestDTO dto = new HelpRequestDTO();
+    private HelpRequestCreationDTO toDTO(HelpRequest helpRequest) {
+        HelpRequestCreationDTO dto = new HelpRequestCreationDTO();
         dto.setId(helpRequest.getId());
         dto.setStudentId(helpRequest.getStudentId());
-        dto.setTitre(helpRequest.getTitre());
+        dto.setTitle(helpRequest.getTitle());
         dto.setDescription(helpRequest.getDescription());
-        dto.setMotsCles(helpRequest.getMotsCles());
-        dto.setDateCreation(helpRequest.getDateCreation());
-        dto.setStatut(helpRequest.getStatut());
-        dto.setType(helpRequest.getType());
+        dto.setKeywords(helpRequest.getKeywords());
+        dto.setDesiredDate(helpRequest.getDesiredDate());
         return dto;
     }
 }

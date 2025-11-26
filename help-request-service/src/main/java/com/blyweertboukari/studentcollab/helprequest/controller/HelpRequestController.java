@@ -1,6 +1,6 @@
 package com.blyweertboukari.studentcollab.helprequest.controller;
 
-import com.blyweertboukari.studentcollab.helprequest.dto.HelpRequestDTO;
+import com.blyweertboukari.studentcollab.helprequest.dto.HelpRequestCreationDTO;
 import com.blyweertboukari.studentcollab.helprequest.model.HelpRequest;
 import com.blyweertboukari.studentcollab.helprequest.service.HelpRequestService;
 import jakarta.validation.Valid;
@@ -12,14 +12,15 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@RequestMapping("/helprequests")
 public class HelpRequestController {
     @Autowired
     private HelpRequestService helpRequestService;
 
     @PostMapping
-    public ResponseEntity<HelpRequestDTO> createHelpRequest(@Valid @RequestBody HelpRequestDTO dto) {
+    public ResponseEntity<HelpRequestCreationDTO> createHelpRequest(@Valid @RequestBody HelpRequestCreationDTO dto) {
         try {
-            HelpRequestDTO helpRequest = helpRequestService.createHelpRequest(dto);
+            HelpRequestCreationDTO helpRequest = helpRequestService.createHelpRequest(dto);
             return ResponseEntity.status(HttpStatus.CREATED).body(helpRequest);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
@@ -27,9 +28,9 @@ public class HelpRequestController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<HelpRequestDTO> getHelpRequest(@PathVariable Long id) {
+    public ResponseEntity<HelpRequestCreationDTO> getHelpRequest(@PathVariable Long id) {
         try {
-            HelpRequestDTO helpRequest = helpRequestService.getHelpRequestById(id);
+            HelpRequestCreationDTO helpRequest = helpRequestService.getHelpRequestById(id);
             return ResponseEntity.ok(helpRequest);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -37,9 +38,9 @@ public class HelpRequestController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<HelpRequestDTO> updateHelpRequest(@PathVariable Long id, @Valid @RequestBody HelpRequestDTO dto) {
+    public ResponseEntity<HelpRequestCreationDTO> updateHelpRequest(@PathVariable Long id, @Valid @RequestBody HelpRequestCreationDTO dto) {
         try {
-            HelpRequestDTO helpRequest = helpRequestService.updateHelpRequest(id, dto);
+            HelpRequestCreationDTO helpRequest = helpRequestService.updateHelpRequest(id, dto);
             return ResponseEntity.ok(helpRequest);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -47,9 +48,9 @@ public class HelpRequestController {
     }
 
     @PatchMapping("/{id}/status")
-    public ResponseEntity<HelpRequestDTO> updateStatus(@PathVariable Long id, @RequestParam HelpRequest.StatutDemande statut) {
+    public ResponseEntity<HelpRequestCreationDTO> updateStatus(@PathVariable Long id, @RequestParam HelpRequest.Status status) {
         try {
-            HelpRequestDTO helpRequest = helpRequestService.updateStatus(id, statut);
+            HelpRequestCreationDTO helpRequest = helpRequestService.updateStatus(id, status);
             return ResponseEntity.ok(helpRequest);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -67,32 +68,26 @@ public class HelpRequestController {
     }
 
     @GetMapping
-    public ResponseEntity<List<HelpRequestDTO>> getAllHelpRequests() {
-        List<HelpRequestDTO> helpRequests = helpRequestService.getAllHelpRequests();
+    public ResponseEntity<List<HelpRequestCreationDTO>> getAllHelpRequests() {
+        List<HelpRequestCreationDTO> helpRequests = helpRequestService.getAllHelpRequests();
         return ResponseEntity.ok(helpRequests);
     }
 
     @GetMapping("/student/{studentId}")
-    public ResponseEntity<List<HelpRequestDTO>> getHelpRequestsByStudent(@PathVariable Long studentId) {
-        List<HelpRequestDTO> helpRequests = helpRequestService.getHelpRequestsByStudent(studentId);
+    public ResponseEntity<List<HelpRequestCreationDTO>> getHelpRequestsByStudent(@PathVariable Long studentId) {
+        List<HelpRequestCreationDTO> helpRequests = helpRequestService.getHelpRequestsByStudent(studentId);
         return ResponseEntity.ok(helpRequests);
     }
 
-    @GetMapping("/status/{statut}")
-    public ResponseEntity<List<HelpRequestDTO>> getHelpRequestsByStatus(@PathVariable HelpRequest.StatutDemande statut) {
-        List<HelpRequestDTO> helpRequests = helpRequestService.getHelpRequestsByStatus(statut);
-        return ResponseEntity.ok(helpRequests);
-    }
-
-    @GetMapping("/type/{type}")
-    public ResponseEntity<List<HelpRequestDTO>> getHelpRequestsByType(@PathVariable HelpRequest.TypeDemande type) {
-        List<HelpRequestDTO> helpRequests = helpRequestService.getHelpRequestsByType(type);
+    @GetMapping("/status/{status}")
+    public ResponseEntity<List<HelpRequestCreationDTO>> getHelpRequestsByStatus(@PathVariable HelpRequest.Status status) {
+        List<HelpRequestCreationDTO> helpRequests = helpRequestService.getHelpRequestsByStatus(status);
         return ResponseEntity.ok(helpRequests);
     }
 
     @GetMapping("/keyword/{keyword}")
-    public ResponseEntity<List<HelpRequestDTO>> getHelpRequestsByKeyword(@PathVariable String keyword) {
-        List<HelpRequestDTO> helpRequests = helpRequestService.getHelpRequestsByKeyword(keyword);
+    public ResponseEntity<List<HelpRequestCreationDTO>> getHelpRequestsByKeyword(@PathVariable String keyword) {
+        List<HelpRequestCreationDTO> helpRequests = helpRequestService.getHelpRequestsByKeyword(keyword);
         return ResponseEntity.ok(helpRequests);
     }
 }

@@ -40,6 +40,9 @@ public class HelpRequest {
     @Column(nullable = false)
     private Instant createdAt = Instant.now();
 
+    // Desired date/time for the help session
+    private Instant desiredDate;
+
     public enum Status {
         WAITING,
         IN_PROGRESS,

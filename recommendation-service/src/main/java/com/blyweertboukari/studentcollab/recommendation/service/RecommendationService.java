@@ -51,14 +51,14 @@ public class RecommendationService {
     private double calculateMatchScore(HelpRequestDTO helpRequest, StudentDTO student) {
         double score = 0.0;
         
-        if (helpRequest.getMotsCles() != null && student.getSkills() != null) {
-            long matchingCompetences = helpRequest.getMotsCles().stream()
+        if (helpRequest.getKeywords() != null && student.getSkills() != null) {
+            long matchingCompetences = helpRequest.getKeywords().stream()
                     .filter(keyword -> student.getSkills().stream()
                             .anyMatch(comp -> comp.toLowerCase().contains(keyword.toLowerCase())))
                     .count();
             
-            if (!helpRequest.getMotsCles().isEmpty()) {
-                score += (matchingCompetences * 40.0) / helpRequest.getMotsCles().size();
+            if (!helpRequest.getKeywords().isEmpty()) {
+                score += (matchingCompetences * 40.0) / helpRequest.getKeywords().size();
             }
         }
         
@@ -66,8 +66,8 @@ public class RecommendationService {
             score += 20.0;
         }
         
-        if (student.getAverageReview() != null && student.getAverageReview() > 0) {
-            score += student.getAverageReview() * 8.0;
+        if (student.getAverageRating() != null && student.getAverageRating() > 0) {
+            score += student.getAverageRating() * 8.0;
         }
         
         return Math.min(score, 100.0);
@@ -76,27 +76,27 @@ public class RecommendationService {
     private String generateReason(HelpRequestDTO helpRequest, StudentDTO student, double score) {
         List<String> reasons = new ArrayList<>();
         
-        if (helpRequest.getMotsCles() != null && student.getSkills() != null) {
-            long matchingCompetences = helpRequest.getMotsCles().stream()
+        if (helpRequest.getKeywords() != null && student.getSkills() != null) {
+            long matchingCompetences = helpRequest.getKeywords().stream()
                     .filter(keyword -> student.getSkills().stream()
                             .anyMatch(comp -> comp.toLowerCase().contains(keyword.toLowerCase())))
                     .count();
             
             if (matchingCompetences > 0) {
-                reasons.add("Compétences correspondantes: " + matchingCompetences);
+                reasons.add("Corresponding skills: " + matchingCompetences);
             }
         }
         
         if (student.getAvailabilities() != null && !student.getAvailabilities().isEmpty()) {
-            reasons.add("Disponible");
+            reasons.add("Available");
         }
         
-        if (student.getAverageReview() != null && student.getAverageReview() > 3.5) {
-            reasons.add("Bonne réputation (note: " + String.format("%.1f", student.getAverageReview()) + "/5)");
+        if (student.getAverageRating() != null && student.getAverageRating() > 3.5) {
+            reasons.add("Good reputation (score: " + String.format("%.1f", student.getAverageRating()) + "/5)");
         }
         
         if (reasons.isEmpty()) {
-            return "Étudiant potentiellement intéressé";
+            return "Potentially interested student";
         }
         
         return String.join(", ", reasons);

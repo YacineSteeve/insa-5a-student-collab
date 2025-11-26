@@ -44,13 +44,13 @@ public class HelpRequestService {
 
     public HelpRequestDTO getHelpRequestById(Long id) {
         HelpRequest helpRequest = helpRequestRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Help request not found"));
+                .orElseThrow(() -> new NotFoundException("Help request not found"));
         return toDTO(helpRequest);
     }
 
     public HelpRequestDTO updateHelpRequest(Long id, HelpRequestCreationDTO dto) {
         HelpRequest helpRequest = helpRequestRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Help request not found"));
+                .orElseThrow(() -> new NotFoundException("Help request not found"));
 
         helpRequest.setTitle(dto.getTitle());
         helpRequest.setDescription(dto.getDescription());
@@ -63,7 +63,7 @@ public class HelpRequestService {
 
     public HelpRequestDTO updateStatus(Long id, HelpRequest.Status status) {
         HelpRequest helpRequest = helpRequestRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Help request not found"));
+                .orElseThrow(() -> new NotFoundException("Help request not found"));
 
         helpRequest.setStatus(status);
         helpRequest = helpRequestRepository.save(helpRequest);
@@ -72,7 +72,7 @@ public class HelpRequestService {
 
     public void deleteHelpRequest(Long id) {
         if (!helpRequestRepository.existsById(id)) {
-            throw new RuntimeException("Help request not found");
+            throw new NotFoundException("Help request not found");
         }
         helpRequestRepository.deleteById(id);
     }

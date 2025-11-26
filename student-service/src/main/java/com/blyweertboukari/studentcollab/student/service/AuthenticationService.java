@@ -8,7 +8,7 @@ import com.blyweertboukari.studentcollab.student.repository.StudentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -16,7 +16,7 @@ public class AuthenticationService {
     @Autowired
     private StudentRepository studentRepository;
     @Autowired
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
+    private PasswordEncoder passwordEncoder;
     @Autowired
     private AuthenticationManager authenticationManager;
 
@@ -27,7 +27,7 @@ public class AuthenticationService {
 
         Student student = new Student();
         student.setEmail(registrationDTO.getEmail());
-        student.setPassword(bCryptPasswordEncoder.encode(registrationDTO.getPassword()));
+        student.setPassword(passwordEncoder.encode(registrationDTO.getPassword()));
         student.setFirstName(registrationDTO.getFirstName());
         student.setLastName(registrationDTO.getLastName());
         student.setEstablishment(registrationDTO.getEstablishment());

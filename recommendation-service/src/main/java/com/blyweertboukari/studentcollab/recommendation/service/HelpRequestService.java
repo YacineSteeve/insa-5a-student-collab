@@ -15,7 +15,7 @@ public class HelpRequestService {
     public HelpRequestDTO getHelpRequestById(Long id) {
         return webClientBuilder.build()
                 .get()
-                .uri(HELP_REQUEST_SERVICE_URI + "/helprequests/" + id)
+                .uri(HELP_REQUEST_SERVICE_URI + "/help-requests/" + id)
                 .retrieve()
                 .bodyToMono(HelpRequestDTO.class)
                 .block();

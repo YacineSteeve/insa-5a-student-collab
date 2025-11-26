@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/helprequests")
+@RequestMapping("/help-requests")
 @Tag(name = "Help Requests", description = "Help Request API")
 public class HelpRequestController {
     @Autowired

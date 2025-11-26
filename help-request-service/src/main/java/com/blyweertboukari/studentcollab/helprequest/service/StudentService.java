@@ -4,7 +4,6 @@ import com.blyweertboukari.studentcollab.helprequest.dto.StudentDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 
 @Service
 public class StudentService {
@@ -13,11 +12,12 @@ public class StudentService {
 
     private static final String STUDENT_SERVICE_URI = "lb://student-service";
 
-    public Mono<StudentDTO> getStudentById(Long id) {
+    public StudentDTO getStudentById(Long id) {
         return webClientBuilder.build()
                 .get()
                 .uri(STUDENT_SERVICE_URI + "/students/" + id)
                 .retrieve()
-                .bodyToMono(StudentDTO.class);
+                .bodyToMono(StudentDTO.class)
+                .block();
     }
 }

@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,44 +15,36 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class HelpRequest {
-    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
     @Column(nullable = false)
-    private Long studentId;
-    
-    @Column(nullable = false)
-    private String titre;
-    
+    private String title;
+
     @Column(length = 2000, nullable = false)
     private String description;
-    
+
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "help_request_keywords", joinColumns = @JoinColumn(name = "help_request_id"))
-    @Column(name = "keyword")
-    private List<String> motsCles = new ArrayList<>();
-    
+    @Column(name = "keywords")
+    private List<String> keywords = new ArrayList<>();
+
     @Column(nullable = false)
-    private LocalDateTime dateCreation = LocalDateTime.now();
-    
+    private Long studentId;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private StatutDemande statut = StatutDemande.EN_ATTENTE;
-    
+    private Status status = Status.WAITING;
+
     @Column(nullable = false)
-    private TypeDemande type;
-    
-    public enum StatutDemande {
-        EN_ATTENTE,
-        EN_COURS,
-        TERMINEE,
-        ANNULEE
-    }
-    
-    public enum TypeDemande {
-        DEMANDE_AIDE,
-        OFFRE_AIDE
+    private Instant createdAt = Instant.now();
+
+    public enum Status {
+        WAITING,
+        IN_PROGRESS,
+        DONE,
+        ABANDONED,
+        CLOSED
     }
 }

@@ -1,54 +1,24 @@
 package com.blyweertboukari.studentcollab.student.service;
 
-import com.blyweertboukari.studentcollab.student.dto.LoginDTO;
-import com.blyweertboukari.studentcollab.student.dto.RegistrationDTO;
 import com.blyweertboukari.studentcollab.student.dto.StudentDTO;
+import com.blyweertboukari.studentcollab.student.dto.StudentUpdateDTO;
+import com.blyweertboukari.studentcollab.student.dto.StudentsFilters;
 import com.blyweertboukari.studentcollab.student.exceptions.NotFoundException;
 import com.blyweertboukari.studentcollab.student.model.Student;
 import com.blyweertboukari.studentcollab.student.repository.StudentRepository;
+import com.blyweertboukari.studentcollab.student.repository.StudentSpecifications;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
 public class StudentService {
-
     @Autowired
     private StudentRepository studentRepository;
-
-    public StudentDTO register(RegistrationDTO registrationDTO) {
-        if (studentRepository.existsByEmail(registrationDTO.getEmail())) {
-            throw new RuntimeException("A student with this email already exists");
-        }
-
-        Student student = new Student();
-        student.setLastName(registrationDTO.getLastName());
-        student.setFirstName(registrationDTO.getFirstName());
-        student.setEmail(registrationDTO.getEmail());
-        student.setPassword(registrationDTO.getPassword());
-        student.setEstablishment(registrationDTO.getEstablishment());
-        student.setMajor(registrationDTO.getMajor());
-        student.setSkills(registrationDTO.getSkills());
-        student.setAvailabilities(registrationDTO.getAvailabilities());
-
-        student = studentRepository.save(student);
-        return toDTO(student);
-    }
-
-    public StudentDTO login(LoginDTO loginDTO) {
-        Student student = studentRepository.findByEmail(loginDTO.getEmail())
-                .orElseThrow(() -> new RuntimeException("Invalid email or password"));
-
-        if (!student.getPassword().equals(loginDTO.getPassword())) {
-            throw new RuntimeException("Invalid email or password");
-        }
-
-        return toDTO(student);
-    }
 
     public StudentDTO getStudentById(Long id) {
         Student student = studentRepository.findById(id)
@@ -56,9 +26,9 @@ public class StudentService {
         return toDTO(student);
     }
 
-    public StudentDTO updateStudent(Long id, StudentDTO studentDTO) {
+    public StudentDTO updateStudent(Long id, StudentUpdateDTO studentDTO) {
         Student student = studentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Student not found"));
+                .orElseThrow(() -> new NotFoundException("Student not found"));
 
         student.setLastName(studentDTO.getLastName());
         student.setFirstName(studentDTO.getFirstName());
@@ -73,33 +43,26 @@ public class StudentService {
 
     public void deleteStudent(Long id) {
         if (!studentRepository.existsById(id)) {
-            throw new RuntimeException("Student not found");
+            throw new NotFoundException("Student not found");
         }
         studentRepository.deleteById(id);
     }
 
-    public List<StudentDTO> getAllStudents() {
-        return studentRepository.findAll().stream()
-                .map(this::toDTO)
-                .collect(Collectors.toList());
-    }
+    public List<StudentDTO> getAllStudents(StudentsFilters filters) {
+        Specification<Student> spec = (root, query, cb) -> cb.conjunction();
 
-    public List<StudentDTO> getStudentsBySkill(String skill) {
-        return studentRepository.findBySkillsContaining(skill).stream()
-                .map(this::toDTO)
-                .collect(Collectors.toList());
-    }
-
-    public List<StudentDTO> getStudentsByMajor(String major) {
-        // Attempt to map string to enum; fallback to all if invalid
-        try {
-            Student.Major major_ = Student.Major.valueOf(major.toUpperCase());
-            return studentRepository.findByMajor(major_).stream()
-                    .map(this::toDTO)
-                    .collect(Collectors.toList());
-        } catch (IllegalArgumentException ex) {
-            return List.of();
+        if (filters.getSkills() != null && !filters.getSkills().isEmpty()) {
+            spec = spec.and(StudentSpecifications.hasAnySkills(filters.getSkills()));
         }
+
+        if (filters.getMajors() != null && !filters.getMajors().isEmpty()) {
+            spec = spec.and(StudentSpecifications.hasMajors(filters.getMajors()));
+        }
+
+        return studentRepository.findAll(spec)
+                .stream()
+                .map(this::toDTO)
+                .toList();
     }
 
     public StudentDTO toDTO(Student student) {

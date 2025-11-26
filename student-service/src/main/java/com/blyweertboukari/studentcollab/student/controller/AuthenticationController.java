@@ -26,7 +26,7 @@ public class AuthenticationController {
     private StudentService studentService;
 
     @PostMapping("/signup")
-    @Operation(summary = "Register Student")
+    @Operation(summary = "Register student")
     public ResponseEntity<StudentDTO> register(@RequestBody RegistrationDTO registrationDTO) {
         Student student = authenticationService.signup(registrationDTO);
 
@@ -36,7 +36,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/login")
-    @Operation(summary = "Log Student In")
+    @Operation(summary = "Log student in")
     public ResponseEntity<LoginResponse> authenticate(@RequestBody LoginDTO loginDTO) {
         Student authenticatedStudent = authenticationService.authenticate(loginDTO);
 

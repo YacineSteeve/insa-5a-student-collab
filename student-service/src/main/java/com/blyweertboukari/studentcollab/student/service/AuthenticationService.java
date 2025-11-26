@@ -2,6 +2,7 @@ package com.blyweertboukari.studentcollab.student.service;
 
 import com.blyweertboukari.studentcollab.student.dto.LoginDTO;
 import com.blyweertboukari.studentcollab.student.dto.RegistrationDTO;
+import com.blyweertboukari.studentcollab.student.exceptions.ConflictException;
 import com.blyweertboukari.studentcollab.student.model.Student;
 import com.blyweertboukari.studentcollab.student.repository.StudentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,7 @@ public class AuthenticationService {
 
     public Student signup(RegistrationDTO registrationDTO) {
         if (studentRepository.existsByEmail(registrationDTO.getEmail())) {
-            throw new RuntimeException("A student with this email already exists");
+            throw new ConflictException("A student with this email already exists");
         }
 
         Student student = new Student();

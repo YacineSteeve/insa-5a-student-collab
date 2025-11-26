@@ -4,9 +4,12 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -20,6 +23,14 @@ public class Student implements UserDetails  {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @CreationTimestamp
+    @Column(nullable = false, updatable = false)
+    private Instant createdAt = Instant.now();
+
+    @UpdateTimestamp
+    @Column(nullable = false)
+    private Instant updatedAt = Instant.now();
 
     @Column(nullable = false)
     private String lastName;
@@ -63,7 +74,6 @@ public class Student implements UserDetails  {
                 .average()
                 .orElse(0.0);
     }
-
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

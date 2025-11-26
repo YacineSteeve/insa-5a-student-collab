@@ -4,9 +4,12 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -19,16 +22,19 @@ public class HelpRequest {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @CreationTimestamp
+    @Column(nullable = false, updatable = false)
+    private Instant createdAt = Instant.now();
+
+    @UpdateTimestamp
+    @Column(nullable = false)
+    private Instant updatedAt = Instant.now();
+
     @Column(nullable = false)
     private String title;
 
     @Column(length = 2000, nullable = false)
     private String description;
-
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "help_request_keywords", joinColumns = @JoinColumn(name = "help_request_id"))
-    @Column(name = "keywords")
-    private List<String> keywords = new ArrayList<>();
 
     @Column(nullable = false)
     private Long studentId;
@@ -38,10 +44,12 @@ public class HelpRequest {
     private Status status = Status.WAITING;
 
     @Column(nullable = false)
-    private Instant createdAt = Instant.now();
+    private Date desiredDate;
 
-    @Column(nullable = false)
-    private Instant desiredDate;
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "help_request_keywords", joinColumns = @JoinColumn(name = "help_request_id"))
+    @Column(name = "keywords")
+    private List<String> keywords = new ArrayList<>();
 
     public enum Status {
         WAITING,

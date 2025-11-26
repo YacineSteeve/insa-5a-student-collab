@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 import jakarta.validation.constraints.NotBlank;
 import org.hibernate.validator.constraints.UniqueElements;
 
-import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Data
@@ -33,5 +33,5 @@ public class HelpRequestCreationDTO {
     private List<String> keywords = new ArrayList<>();
 
     @NotNull(message = "Desired date is required")
-    private Instant desiredDate;
+    private Date desiredDate;
 }

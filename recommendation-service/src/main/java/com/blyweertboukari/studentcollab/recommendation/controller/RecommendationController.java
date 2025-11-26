@@ -17,9 +17,9 @@ public class RecommendationController {
     @Autowired
     private RecommendationService recommendationService;
     
-    @GetMapping("/help-request/{helpRequestId}")
+    @GetMapping("/recommendations")
     @Operation(summary = "Get Recommendations For Help Request")
-    public ResponseEntity<List<RecommendationDTO>> getRecommendations(@PathVariable Long helpRequestId) {
+    public ResponseEntity<List<RecommendationDTO>> getRecommendations(@RequestParam Long helpRequestId) {
         try {
             List<RecommendationDTO> recommendations = recommendationService.recommendStudentsForHelpRequest(helpRequestId);
             return ResponseEntity.ok(recommendations);

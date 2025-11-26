@@ -1,5 +1,6 @@
 package com.blyweertboukari.studentcollab.student.dto;
 
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,10 +12,10 @@ import jakarta.validation.constraints.NotBlank;
 @NoArgsConstructor
 @AllArgsConstructor
 public class LoginDTO {
-    @NotBlank(message = "L'email est obligatoire")
-    @Email(message = "L'email doit être valide")
+    @NotBlank(message = "Email is required")
+    @Email(message = "Email should be valid")
     private String email;
-    
-    @NotBlank(message = "Le mot de passe est obligatoire")
+
+    @NotBlank(message = "Password is required")
     private String password;
 }

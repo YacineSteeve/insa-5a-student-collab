@@ -5,14 +5,14 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Entity
-@Table(name = "avis")
+@Table(name = "review")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Avis {
+public class Review {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,16 +21,13 @@ public class Avis {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "student_id", nullable = false)
     private Student student;
-    
+
     @Column(nullable = false)
-    private String auteur;
-    
-    @Column(nullable = false)
-    private Integer note;
+    private Integer score;
     
     @Column(length = 1000)
-    private String commentaire;
+    private String comment;
     
     @Column(nullable = false)
-    private LocalDateTime dateCreation = LocalDateTime.now();
+    private Instant createdAt = Instant.now();
 }

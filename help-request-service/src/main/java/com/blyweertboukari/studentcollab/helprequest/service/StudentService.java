@@ -11,12 +11,12 @@ public class StudentService {
     @Autowired
     private WebClient.Builder webClientBuilder;
 
-    private static final String STUDENT_SERVICE_URL = "lb://student-service";
+    private static final String STUDENT_SERVICE_URI = "lb://student-service";
 
     public Mono<StudentDTO> getStudentById(Long id) {
         return webClientBuilder.build()
                 .get()
-                .uri(STUDENT_SERVICE_URL + "/students/" + id)
+                .uri(STUDENT_SERVICE_URI + "/students/" + id)
                 .retrieve()
                 .bodyToMono(StudentDTO.class);
     }

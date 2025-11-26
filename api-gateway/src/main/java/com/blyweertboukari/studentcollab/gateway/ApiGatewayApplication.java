@@ -1,4 +1,4 @@
-package fr.insa.gateway;
+package com.blyweertboukari.studentcollab.gateway;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

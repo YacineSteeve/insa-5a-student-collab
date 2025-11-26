@@ -13,12 +13,11 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/students")
 public class StudentController {
-    
+
     @Autowired
     private StudentService studentService;
-    
+
     @PostMapping("/register")
     public ResponseEntity<StudentDTO> register(@Valid @RequestBody StudentRegistrationDTO registrationDTO) {
         try {

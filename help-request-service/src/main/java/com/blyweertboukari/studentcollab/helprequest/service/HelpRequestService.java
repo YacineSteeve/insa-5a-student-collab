@@ -1,6 +1,8 @@
 package com.blyweertboukari.studentcollab.helprequest.service;
 
 import com.blyweertboukari.studentcollab.helprequest.dto.HelpRequestCreationDTO;
+import com.blyweertboukari.studentcollab.helprequest.dto.StudentDTO;
+import com.blyweertboukari.studentcollab.helprequest.exceptions.NotFoundException;
 import com.blyweertboukari.studentcollab.helprequest.model.HelpRequest;
 import com.blyweertboukari.studentcollab.helprequest.repository.HelpRequestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,13 +18,23 @@ public class HelpRequestService {
     @Autowired
     private HelpRequestRepository helpRequestRepository;
 
+    @Autowired
+    private StudentService studentService;
+
     public HelpRequestCreationDTO createHelpRequest(HelpRequestCreationDTO dto) {
+        StudentDTO studentDTO = studentService.getStudentById(dto.getStudentId());
+
+        if (studentDTO == null) {
+            throw new NotFoundException("Student not found");
+        }
+
         HelpRequest helpRequest = new HelpRequest();
-        helpRequest.setStudentId(dto.getStudentId());
+        helpRequest.setStudentId(studentDTO.getId());
         helpRequest.setTitle(dto.getTitle());
         helpRequest.setDescription(dto.getDescription());
         helpRequest.setKeywords(dto.getKeywords());
         helpRequest.setDesiredDate(dto.getDesiredDate());
+        helpRequest.setStatus(HelpRequest.Status.WAITING);
 
         helpRequest = helpRequestRepository.save(helpRequest);
         return toDTO(helpRequest);

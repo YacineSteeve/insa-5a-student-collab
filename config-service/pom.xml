@@ -12,10 +12,10 @@
 	</parent>
 
 	<groupId>com.blyweertboukari.studentcollab</groupId>
-	<artifactId>config-server</artifactId>
+	<artifactId>config-service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>Config Server</name>
-	<description>Config Server</description>
+	<name>Config Service</name>
+	<description>Configuration Service</description>
 
 	<properties>
         <java.version>21</java.version>

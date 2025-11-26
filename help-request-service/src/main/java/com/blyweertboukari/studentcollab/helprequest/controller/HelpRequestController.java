@@ -53,17 +53,6 @@ public class HelpRequestController {
         }
     }
 
-    @PatchMapping("/{id}/status")
-    @Operation(summary = "Get Help Request Status By ID")
-    public ResponseEntity<HelpRequestCreationDTO> updateStatus(@PathVariable Long id, @RequestParam HelpRequest.Status status) {
-        try {
-            HelpRequestCreationDTO helpRequest = helpRequestService.updateStatus(id, status);
-            return ResponseEntity.ok(helpRequest);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-    }
-
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete Help Request By ID")
     public ResponseEntity<Void> deleteHelpRequest(@PathVariable Long id) {

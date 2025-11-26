@@ -10,5 +10,5 @@ import lombok.NoArgsConstructor;
 public class RecommendationDTO {
     private StudentDTO student;
     private Double score;
-    private String raison;
+    private String reason;
 }

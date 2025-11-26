@@ -1,5 +1,6 @@
 package com.blyweertboukari.studentcollab.student.dto;
 
+import com.blyweertboukari.studentcollab.student.model.Student;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,20 +15,24 @@ import java.util.List;
 public class StudentDTO {
     private Long id;
 
-    @NotBlank(message = "Le nom est obligatoire")
-    private String nom;
+    @NotBlank(message = "Last name is required")
+    private String lastName;
 
-    @NotBlank(message = "L'email est obligatoire")
-    @Email(message = "L'email doit être valide")
+    @NotBlank(message = "First name is required")
+    private String firstName;
+
+    @NotBlank(message = "Email is required")
+    @Email(message = "Email should be valid")
     private String email;
 
-    @NotBlank(message = "L'établissement est obligatoire")
-    private String etablissement;
+    @NotBlank(message = "Establishment is required")
+    private String establishment;
 
-    @NotBlank(message = "La filière est obligatoire")
-    private String filiere;
+    @NotBlank(message = "Major is required")
+    private Student.Major major;
 
-    private List<String> competences;
-    private List<String> disponibilites;
-    private Double moyenneAvis;
+    private List<String> skills;
+    private List<String> availabilities;
+    private Double averageReview;
+
 }

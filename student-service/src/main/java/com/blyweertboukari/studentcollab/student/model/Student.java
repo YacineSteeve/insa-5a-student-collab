@@ -20,7 +20,10 @@ public class Student {
     private Long id;
     
     @Column(nullable = false)
-    private String nom;
+    private String lastName;
+
+    @Column(nullable = false)
+    private String firstName;
     
     @Column(nullable = false, unique = true)
     private String email;
@@ -29,32 +32,46 @@ public class Student {
     private String password;
     
     @Column(nullable = false)
-    private String etablissement;
-    
+    private String establishment;
+
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String filiere;
+    private Major major;
     
     @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "student_competences", joinColumns = @JoinColumn(name = "student_id"))
-    @Column(name = "competence")
-    private List<String> competences = new ArrayList<>();
+    @CollectionTable(name = "student_skills", joinColumns = @JoinColumn(name = "student_id"))
+    @Column(name = "skills")
+    private List<String> skills = new ArrayList<>();
     
     @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "student_disponibilites", joinColumns = @JoinColumn(name = "student_id"))
-    @Column(name = "disponibilite")
-    private List<String> disponibilites = new ArrayList<>();
-    
+    @CollectionTable(name = "student_availabilities", joinColumns = @JoinColumn(name = "student_id"))
+    @Column(name = "availabilities")
+    private List<String> availabilities = new ArrayList<>();
+
     @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Avis> avis = new ArrayList<>();
+    private List<Review> reviews = new ArrayList<>();
     
     @Transient
-    public Double getMoyenneAvis() {
-        if (avis == null || avis.isEmpty()) {
+    public Double getAverageReview() {
+        if (reviews == null || reviews.isEmpty()) {
             return 0.0;
         }
-        return avis.stream()
-                .mapToInt(Avis::getNote)
+        return reviews.stream()
+                .mapToInt(Review::getScore)
                 .average()
                 .orElse(0.0);
+    }
+
+    public enum Major {
+        COMPUTER_SCIENCE,
+        MATHEMATICS,
+        PHYSICS,
+        CHEMISTRY,
+        BIOLOGY,
+        ECONOMICS,
+        BUSINESS,
+        LITERATURE,
+        HISTORY,
+        ARTS
     }
 }

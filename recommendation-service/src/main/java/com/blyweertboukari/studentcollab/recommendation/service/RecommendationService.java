@@ -5,7 +5,6 @@ import com.blyweertboukari.studentcollab.recommendation.dto.RecommendationDTO;
 import com.blyweertboukari.studentcollab.recommendation.dto.StudentDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -33,12 +32,12 @@ public class RecommendationService {
             }
             
             double score = calculateMatchScore(helpRequest, student);
-            String raison = generateReason(helpRequest, student, score);
+            String reason = generateReason(helpRequest, student, score);
             
             RecommendationDTO recommendation = new RecommendationDTO();
             recommendation.setStudent(student);
             recommendation.setScore(score);
-            recommendation.setRaison(raison);
+            recommendation.setReason(reason);
             
             recommendations.add(recommendation);
         }
@@ -52,9 +51,9 @@ public class RecommendationService {
     private double calculateMatchScore(HelpRequestDTO helpRequest, StudentDTO student) {
         double score = 0.0;
         
-        if (helpRequest.getMotsCles() != null && student.getCompetences() != null) {
+        if (helpRequest.getMotsCles() != null && student.getSkills() != null) {
             long matchingCompetences = helpRequest.getMotsCles().stream()
-                    .filter(keyword -> student.getCompetences().stream()
+                    .filter(keyword -> student.getSkills().stream()
                             .anyMatch(comp -> comp.toLowerCase().contains(keyword.toLowerCase())))
                     .count();
             
@@ -63,12 +62,12 @@ public class RecommendationService {
             }
         }
         
-        if (student.getDisponibilites() != null && !student.getDisponibilites().isEmpty()) {
+        if (student.getAvailabilities() != null && !student.getAvailabilities().isEmpty()) {
             score += 20.0;
         }
         
-        if (student.getMoyenneAvis() != null && student.getMoyenneAvis() > 0) {
-            score += student.getMoyenneAvis() * 8.0;
+        if (student.getAverageReview() != null && student.getAverageReview() > 0) {
+            score += student.getAverageReview() * 8.0;
         }
         
         return Math.min(score, 100.0);
@@ -77,9 +76,9 @@ public class RecommendationService {
     private String generateReason(HelpRequestDTO helpRequest, StudentDTO student, double score) {
         List<String> reasons = new ArrayList<>();
         
-        if (helpRequest.getMotsCles() != null && student.getCompetences() != null) {
+        if (helpRequest.getMotsCles() != null && student.getSkills() != null) {
             long matchingCompetences = helpRequest.getMotsCles().stream()
-                    .filter(keyword -> student.getCompetences().stream()
+                    .filter(keyword -> student.getSkills().stream()
                             .anyMatch(comp -> comp.toLowerCase().contains(keyword.toLowerCase())))
                     .count();
             
@@ -88,12 +87,12 @@ public class RecommendationService {
             }
         }
         
-        if (student.getDisponibilites() != null && !student.getDisponibilites().isEmpty()) {
+        if (student.getAvailabilities() != null && !student.getAvailabilities().isEmpty()) {
             reasons.add("Disponible");
         }
         
-        if (student.getMoyenneAvis() != null && student.getMoyenneAvis() > 3.5) {
-            reasons.add("Bonne réputation (note: " + String.format("%.1f", student.getMoyenneAvis()) + "/5)");
+        if (student.getAverageReview() != null && student.getAverageReview() > 3.5) {
+            reasons.add("Bonne réputation (note: " + String.format("%.1f", student.getAverageReview()) + "/5)");
         }
         
         if (reasons.isEmpty()) {

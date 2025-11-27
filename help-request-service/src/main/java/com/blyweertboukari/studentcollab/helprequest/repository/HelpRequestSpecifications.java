@@ -9,7 +9,6 @@ import java.time.Instant;
 import java.util.List;
 
 public class HelpRequestSpecifications {
-    // Filter by multiple statuses
     public static Specification<HelpRequest> hasStatuses(List<HelpRequest.Status> statuses) {
         return (root, query, cb) -> {
             if (statuses == null || statuses.isEmpty()) return null;
@@ -17,7 +16,6 @@ public class HelpRequestSpecifications {
         };
     }
 
-    // Filter by author
     public static Specification<HelpRequest> hasAuthor(Long authorId) {
         return (root, query, cb) -> {
             if (authorId == null) return null;
@@ -25,7 +23,6 @@ public class HelpRequestSpecifications {
         };
     }
 
-    // Filter by assignee
     public static Specification<HelpRequest> hasAssignee(Long assigneeId) {
         return (root, query, cb) -> {
             if (assigneeId == null) return null;
@@ -33,7 +30,6 @@ public class HelpRequestSpecifications {
         };
     }
 
-    // Filter desiredDate >= from
     public static Specification<HelpRequest> desiredDateFrom(Instant from) {
         return (root, query, cb) -> {
             if (from == null) return null;
@@ -41,7 +37,6 @@ public class HelpRequestSpecifications {
         };
     }
 
-    // Filter desiredDate <= to
     public static Specification<HelpRequest> desiredDateTo(Instant to) {
         return (root, query, cb) -> {
             if (to == null) return null;
@@ -49,21 +44,17 @@ public class HelpRequestSpecifications {
         };
     }
 
-    // Filter by ALL keywords
     public static Specification<HelpRequest> hasAllKeywords(List<String> keywords) {
         return (root, query, cb) -> {
             if (keywords == null || keywords.isEmpty()) return null;
 
             Join<HelpRequest, String> keywordsJoin = root.join("keywords");
 
-            // WHERE keyword IN (:keywords)
             var predicate = keywordsJoin.in(keywords);
 
-            // GROUP BY help request ID
             assert query != null;
             query.groupBy(root.get("id"));
 
-            // HAVING COUNT(DISTINCT keyword) = number of requested keywords
             query.having(cb.equal(cb.countDistinct(keywordsJoin), keywords.size()));
 
             return predicate;

@@ -14,15 +14,6 @@ public class StudentService {
 
     private static final String STUDENT_SERVICE_URI = "lb://student-service";
 
-    public StudentDTO getStudentById(Long id) {
-        return webClientBuilder.build()
-                .get()
-                .uri(STUDENT_SERVICE_URI + "/students/" + id)
-                .retrieve()
-                .bodyToMono(StudentDTO.class)
-                .block();
-    }
-
     public List<StudentDTO> getAllStudents() {
         return webClientBuilder.build()
                 .get()

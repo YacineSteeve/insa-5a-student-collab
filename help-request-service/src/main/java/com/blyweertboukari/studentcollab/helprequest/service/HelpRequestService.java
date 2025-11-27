@@ -45,18 +45,31 @@ public class HelpRequestService {
         HelpRequest helpRequest = helpRequestRepository.findById(helpRequestId)
                 .orElseThrow(() -> new NotFoundException("Help request not found"));
 
-        if (helpRequest.getAuthorId().equals(userId)) {
-            if (dto.getTitle() != null) helpRequest.setTitle(dto.getTitle());
-
-            if (dto.getDescription() != null) helpRequest.setDescription(dto.getDescription());
-
-            if (dto.getKeywords() != null) helpRequest.setKeywords(dto.getKeywords());
-
-            if (dto.getDesiredDate() != null) helpRequest.setDesiredDate(dto.getDesiredDate());
-        } else if (helpRequest.getAssigneeId() == null && dto.getAssigneeId() != null) {
-            helpRequest.setAssigneeId(dto.getAssigneeId());
-        } else {
+        if (!helpRequest.getAuthorId().equals(userId)) {
             throw new ForbiddenException("You are not allowed to update this help request");
+        }
+
+        if (dto.getTitle() != null) helpRequest.setTitle(dto.getTitle());
+
+        if (dto.getDescription() != null) helpRequest.setDescription(dto.getDescription());
+
+        if (dto.getKeywords() != null) helpRequest.setKeywords(dto.getKeywords());
+
+        if (dto.getDesiredDate() != null) helpRequest.setDesiredDate(dto.getDesiredDate());
+
+        helpRequest = helpRequestRepository.save(helpRequest);
+
+        return toDTO(helpRequest);
+    }
+
+    public HelpRequestDTO changeHelpRequestAssignee(Long userId, Long helpRequestId, Long assigneeId) {
+        HelpRequest helpRequest = helpRequestRepository.findById(helpRequestId)
+                .orElseThrow(() -> new NotFoundException("Help request not found"));
+
+        if (helpRequest.getAuthorId().equals(userId) && assigneeId != null) {
+            helpRequest.setAssigneeId(assigneeId);
+        } else if (helpRequest.getAssigneeId().equals(userId) && assigneeId == null) {
+            helpRequest.setAssigneeId(null);
         }
 
         helpRequest = helpRequestRepository.save(helpRequest);
@@ -76,23 +89,7 @@ public class HelpRequestService {
     }
 
     public List<HelpRequestDTO> getAllHelpRequests(HelpRequestsFilters filters) {
-        Specification<HelpRequest> spec = (root, query, cb) -> cb.conjunction();
-
-        if (filters.getKeywords() != null && !filters.getKeywords().isEmpty()) {
-            spec = spec.and(HelpRequestSpecifications.hasAllKeywords(filters.getKeywords()));
-        }
-
-        if (filters.getStatuses() != null && !filters.getStatuses().isEmpty()) {
-            spec = spec.and(HelpRequestSpecifications.hasStatuses(filters.getStatuses()));
-        }
-
-        if (filters.getDesiredDateFrom() != null) {
-            spec = spec.and(HelpRequestSpecifications.desiredDateFrom(filters.getDesiredDateFrom()));
-        }
-
-        if (filters.getDesiredDateTo() != null) {
-            spec = spec.and(HelpRequestSpecifications.desiredDateTo(filters.getDesiredDateTo()));
-        }
+        Specification<HelpRequest> spec = buildSpecification(filters);
 
         return helpRequestRepository.findAll(spec)
                 .stream()
@@ -101,9 +98,29 @@ public class HelpRequestService {
     }
 
     public List<HelpRequestDTO> getHelpRequestsForUser(Long userId, HelpRequestsFilters filters) {
-        Specification<HelpRequest> spec = (root, query, cb) -> cb.conjunction();
+        Specification<HelpRequest> spec = buildSpecification(filters);
 
         spec = spec.and(HelpRequestSpecifications.hasAuthor(userId));
+
+        return helpRequestRepository.findAll(spec)
+                .stream()
+                .map(this::toDTO)
+                .toList();
+    }
+
+    public List<HelpRequestDTO> getHelpRequestsAssignedToUser(Long userId, HelpRequestsFilters filters) {
+        Specification<HelpRequest> spec = buildSpecification(filters);
+
+        spec = spec.and(HelpRequestSpecifications.hasAssignee(userId));
+
+        return helpRequestRepository.findAll(spec)
+                .stream()
+                .map(this::toDTO)
+                .toList();
+    }
+
+    private Specification<HelpRequest> buildSpecification(HelpRequestsFilters filters) {
+        Specification<HelpRequest> spec = (root, query, cb) -> cb.conjunction();
 
         if (filters.getKeywords() != null && !filters.getKeywords().isEmpty()) {
             spec = spec.and(HelpRequestSpecifications.hasAllKeywords(filters.getKeywords()));
@@ -121,10 +138,7 @@ public class HelpRequestService {
             spec = spec.and(HelpRequestSpecifications.desiredDateTo(filters.getDesiredDateTo()));
         }
 
-        return helpRequestRepository.findAll(spec)
-                .stream()
-                .map(this::toDTO)
-                .toList();
+        return spec;
     }
 
     private HelpRequestDTO toDTO(HelpRequest helpRequest) {

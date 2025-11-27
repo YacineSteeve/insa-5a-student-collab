@@ -25,12 +25,6 @@ public class StudentController {
     @Autowired
     private StudentService studentService;
 
-    private Student getAuthenticatedStudent() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        return (Student) authentication.getPrincipal();
-    }
-
     @GetMapping
     @Operation(summary = "Get All Students")
     public ResponseEntity<List<StudentDTO>> getAllStudents(@Valid @ModelAttribute StudentsFilters filters) {
@@ -53,15 +47,19 @@ public class StudentController {
 
     @GetMapping("/me")
     @Operation(summary = "Get authenticated Student")
-    public ResponseEntity<StudentDTO> authenticatedStudent() {
+    public ResponseEntity<StudentDTO> authenticatedStudent(@RequestHeader(value = "X-User-Id", required = false) String userId) {
         try {
-            Student currentStudent = getAuthenticatedStudent();
-
-            StudentDTO student = studentService.getStudentById(currentStudent.getId());
+            if (userId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+            long id = Long.parseLong(userId);
+            StudentDTO student = studentService.getStudentById(id);
 
             return ResponseEntity.ok(student);
         } catch (NotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (NumberFormatException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
@@ -69,15 +67,20 @@ public class StudentController {
 
     @PutMapping("/me")
     @Operation(summary = "Update authenticated student profile")
-    public ResponseEntity<StudentDTO> updateStudent(@Valid @RequestBody StudentUpdateDTO studentUpdateDTO) {
+    public ResponseEntity<StudentDTO> updateStudent(@RequestHeader(value = "X-User-Id", required = false) String userId,
+                                                    @Valid @RequestBody StudentUpdateDTO studentUpdateDTO) {
         try {
-            Student currentStudent = getAuthenticatedStudent();
-
-            StudentDTO updatedStudent = studentService.updateStudent(currentStudent.getId(), studentUpdateDTO);
+            if (userId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+            long id = Long.parseLong(userId);
+            StudentDTO updatedStudent = studentService.updateStudent(id, studentUpdateDTO);
 
             return ResponseEntity.ok(updatedStudent);
         } catch (NotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (NumberFormatException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
@@ -85,15 +88,19 @@ public class StudentController {
 
     @DeleteMapping("/me")
     @Operation(summary = "Delete authenticated student")
-    public ResponseEntity<Void> deleteStudent() {
+    public ResponseEntity<Void> deleteStudent(@RequestHeader(value = "X-User-Id", required = false) String userId) {
         try {
-            Student currentStudent = getAuthenticatedStudent();
-
-            studentService.deleteStudent(currentStudent.getId());
+            if (userId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+            long id = Long.parseLong(userId);
+            studentService.deleteStudent(id);
 
             return ResponseEntity.noContent().build();
         } catch (NotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (NumberFormatException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }

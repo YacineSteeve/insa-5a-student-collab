@@ -39,8 +39,9 @@ public class AuthenticationController {
     @Operation(summary = "Log student in")
     public ResponseEntity<LoginResponse> authenticate(@RequestBody LoginDTO loginDTO) {
         Student authenticatedStudent = authenticationService.authenticate(loginDTO);
-
-        String jwtToken = jwtService.generateToken(authenticatedStudent);
+        // include the user's id as a claim so downstream services can identify the caller
+        java.util.Map<String, Object> claims = java.util.Map.of("id", authenticatedStudent.getId());
+        String jwtToken = jwtService.generateToken(claims, authenticatedStudent);
 
         LoginResponse loginResponse = new LoginResponse(jwtToken, jwtService.getExpirationTime());
 

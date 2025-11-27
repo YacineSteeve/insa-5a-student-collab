@@ -14,7 +14,7 @@ import java.util.List;
 public class HelpRequestDTO {
 
     private Long id;
-    private Long studentId;
+    private Long authorId;
     private String title;
     private String description;
     private List<String> keywords = new ArrayList<>();

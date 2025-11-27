@@ -29,6 +29,9 @@ public class JwtAuthGlobalFilter implements GlobalFilter, Ordered {
                 path.startsWith("/student-service/auth/")
                 || path.equals("/student-service/students")
                 || path.equals("/help-request-service/help-requests")
+                || path.startsWith("/help-request-service/v3/api-docs")
+                        || path.startsWith("/student-service/v3/api-docs")
+                        || path.startsWith("/recommendation-service/v3/api-docs")
         ) {
             return chain.filter(exchange);
         }

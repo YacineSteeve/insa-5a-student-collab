@@ -2,16 +2,19 @@ package com.blyweertboukari.studentcollab.helprequest.service;
 
 import com.blyweertboukari.studentcollab.helprequest.dto.HelpRequestCreationDTO;
 import com.blyweertboukari.studentcollab.helprequest.dto.HelpRequestDTO;
+import com.blyweertboukari.studentcollab.helprequest.dto.HelpRequestUpdateDTO;
 import com.blyweertboukari.studentcollab.helprequest.dto.HelpRequestsFilters;
+import com.blyweertboukari.studentcollab.helprequest.exceptions.ForbiddenException;
 import com.blyweertboukari.studentcollab.helprequest.exceptions.NotFoundException;
 import com.blyweertboukari.studentcollab.helprequest.model.HelpRequest;
 import com.blyweertboukari.studentcollab.helprequest.repository.HelpRequestRepository;
+import com.blyweertboukari.studentcollab.helprequest.repository.HelpRequestSpecifications;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -19,9 +22,9 @@ public class HelpRequestService {
     @Autowired
     private HelpRequestRepository helpRequestRepository;
 
-    public HelpRequestDTO createHelpRequest(long authorId, HelpRequestCreationDTO dto) {
+    public HelpRequestDTO createHelpRequest(Long userId, HelpRequestCreationDTO dto) {
         HelpRequest helpRequest = new HelpRequest();
-        helpRequest.setAuthorId(authorId);
+        helpRequest.setAuthorId(userId);
         helpRequest.setTitle(dto.getTitle());
         helpRequest.setDescription(dto.getDescription());
         helpRequest.setKeywords(dto.getKeywords());
@@ -32,54 +35,96 @@ public class HelpRequestService {
         return toDTO(helpRequest);
     }
 
-    public HelpRequestDTO getHelpRequestById(Long id) {
-        HelpRequest helpRequest = helpRequestRepository.findById(id)
+    public HelpRequestDTO getHelpRequestById(Long helpRequestId) {
+        HelpRequest helpRequest = helpRequestRepository.findById(helpRequestId)
                 .orElseThrow(() -> new NotFoundException("Help request not found"));
         return toDTO(helpRequest);
     }
 
-    public HelpRequestDTO updateHelpRequest(Long authorId, Long helpRequestId, HelpRequestCreationDTO dto) {
+    public HelpRequestDTO updateHelpRequest(Long userId, Long helpRequestId, HelpRequestUpdateDTO dto) {
         HelpRequest helpRequest = helpRequestRepository.findById(helpRequestId)
                 .orElseThrow(() -> new NotFoundException("Help request not found"));
 
-        helpRequest.setTitle(dto.getTitle());
-        helpRequest.setDescription(dto.getDescription());
-        helpRequest.setKeywords(dto.getKeywords());
-        helpRequest.setDesiredDate(dto.getDesiredDate());
+        if (helpRequest.getAuthorId().equals(userId)) {
+            if (dto.getTitle() != null) helpRequest.setTitle(dto.getTitle());
+
+            if (dto.getDescription() != null) helpRequest.setDescription(dto.getDescription());
+
+            if (dto.getKeywords() != null) helpRequest.setKeywords(dto.getKeywords());
+
+            if (dto.getDesiredDate() != null) helpRequest.setDesiredDate(dto.getDesiredDate());
+        } else if (helpRequest.getAssigneeId() == null && dto.getAssigneeId() != null) {
+            helpRequest.setAssigneeId(dto.getAssigneeId());
+        } else {
+            throw new ForbiddenException("You are not allowed to update this help request");
+        }
 
         helpRequest = helpRequestRepository.save(helpRequest);
+
         return toDTO(helpRequest);
     }
 
-    public void deleteHelpRequest(Long authorId, Long id) {
-        if (!helpRequestRepository.existsById(id)) {
-            throw new NotFoundException("Help request not found");
+    public void deleteHelpRequest(Long userId, Long helpRequestId) {
+        HelpRequest helpRequest = helpRequestRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("Help request not found"));
+
+        if (!helpRequest.getAuthorId().equals(userId)) {
+            throw new ForbiddenException("You are not allowed to delete this help request");
         }
-        helpRequestRepository.deleteById(id);
+
+        helpRequestRepository.deleteById(helpRequestId);
     }
 
     public List<HelpRequestDTO> getAllHelpRequests(HelpRequestsFilters filters) {
-        return helpRequestRepository.findAll().stream()
+        Specification<HelpRequest> spec = (root, query, cb) -> cb.conjunction();
+
+        if (filters.getKeywords() != null && !filters.getKeywords().isEmpty()) {
+            spec = spec.and(HelpRequestSpecifications.hasAllKeywords(filters.getKeywords()));
+        }
+
+        if (filters.getStatuses() != null && !filters.getStatuses().isEmpty()) {
+            spec = spec.and(HelpRequestSpecifications.hasStatuses(filters.getStatuses()));
+        }
+
+        if (filters.getDesiredDateFrom() != null) {
+            spec = spec.and(HelpRequestSpecifications.desiredDateFrom(filters.getDesiredDateFrom()));
+        }
+
+        if (filters.getDesiredDateTo() != null) {
+            spec = spec.and(HelpRequestSpecifications.desiredDateTo(filters.getDesiredDateTo()));
+        }
+
+        return helpRequestRepository.findAll(spec)
+                .stream()
                 .map(this::toDTO)
-                .collect(Collectors.toList());
+                .toList();
     }
 
-    public List<HelpRequestDTO> getHelpRequestsForUser(long authorId, HelpRequestsFilters filters) {
-        return helpRequestRepository.findByAuthorId(authorId).stream()
-                .map(this::toDTO)
-                .collect(Collectors.toList());
-    }
+    public List<HelpRequestDTO> getHelpRequestsForUser(Long userId, HelpRequestsFilters filters) {
+        Specification<HelpRequest> spec = (root, query, cb) -> cb.conjunction();
 
-    public List<HelpRequestDTO> getHelpRequestsByStatus(HelpRequest.Status status) {
-        return helpRequestRepository.findByStatus(status).stream()
-                .map(this::toDTO)
-                .collect(Collectors.toList());
-    }
+        spec = spec.and(HelpRequestSpecifications.hasAuthor(userId));
 
-    public List<HelpRequestDTO> getHelpRequestsByKeyword(String keyword) {
-        return helpRequestRepository.findByKeywordsContaining(keyword).stream()
+        if (filters.getKeywords() != null && !filters.getKeywords().isEmpty()) {
+            spec = spec.and(HelpRequestSpecifications.hasAllKeywords(filters.getKeywords()));
+        }
+
+        if (filters.getStatuses() != null && !filters.getStatuses().isEmpty()) {
+            spec = spec.and(HelpRequestSpecifications.hasStatuses(filters.getStatuses()));
+        }
+
+        if (filters.getDesiredDateFrom() != null) {
+            spec = spec.and(HelpRequestSpecifications.desiredDateFrom(filters.getDesiredDateFrom()));
+        }
+
+        if (filters.getDesiredDateTo() != null) {
+            spec = spec.and(HelpRequestSpecifications.desiredDateTo(filters.getDesiredDateTo()));
+        }
+
+        return helpRequestRepository.findAll(spec)
+                .stream()
                 .map(this::toDTO)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private HelpRequestDTO toDTO(HelpRequest helpRequest) {

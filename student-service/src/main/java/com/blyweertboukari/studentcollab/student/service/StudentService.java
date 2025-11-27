@@ -26,16 +26,27 @@ public class StudentService {
         return toDTO(student);
     }
 
-    public StudentDTO updateStudent(Long id, StudentUpdateDTO studentDTO) {
+    public StudentDTO updateStudent(Long id, StudentUpdateDTO dto) {
         Student student = studentRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Student not found"));
 
-        student.setLastName(studentDTO.getLastName());
-        student.setFirstName(studentDTO.getFirstName());
-        student.setEstablishment(studentDTO.getEstablishment());
-        student.setMajor(studentDTO.getMajor());
-        student.setSkills(studentDTO.getSkills());
-        student.setAvailabilities(studentDTO.getAvailabilities());
+        if (dto.getLastName() != null)
+            student.setLastName(dto.getLastName());
+
+        if (dto.getFirstName() != null)
+            student.setFirstName(dto.getFirstName());
+
+        if (dto.getEstablishment() != null)
+            student.setEstablishment(dto.getEstablishment());
+
+        if (dto.getMajor() != null)
+            student.setMajor(dto.getMajor());
+
+        if (dto.getSkills() != null)
+            student.setSkills(dto.getSkills());
+
+        if (dto.getAvailabilities() != null)
+            student.setAvailabilities(dto.getAvailabilities());
 
         student = studentRepository.save(student);
         return toDTO(student);

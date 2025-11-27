@@ -5,6 +5,7 @@ import org.springframework.data.jpa.domain.Specification;
 
 import jakarta.persistence.criteria.Join;
 
+import java.time.Instant;
 import java.util.List;
 
 public class HelpRequestSpecifications {
@@ -33,7 +34,7 @@ public class HelpRequestSpecifications {
     }
 
     // Filter desiredDate >= from
-    public static Specification<HelpRequest> desiredDateFrom(java.util.Date from) {
+    public static Specification<HelpRequest> desiredDateFrom(Instant from) {
         return (root, query, cb) -> {
             if (from == null) return null;
             return cb.greaterThanOrEqualTo(root.get("desiredDate"), from);
@@ -41,7 +42,7 @@ public class HelpRequestSpecifications {
     }
 
     // Filter desiredDate <= to
-    public static Specification<HelpRequest> desiredDateTo(java.util.Date to) {
+    public static Specification<HelpRequest> desiredDateTo(Instant to) {
         return (root, query, cb) -> {
             if (to == null) return null;
             return cb.lessThanOrEqualTo(root.get("desiredDate"), to);
@@ -59,6 +60,7 @@ public class HelpRequestSpecifications {
             var predicate = keywordsJoin.in(keywords);
 
             // GROUP BY help request ID
+            assert query != null;
             query.groupBy(root.get("id"));
 
             // HAVING COUNT(DISTINCT keyword) = number of requested keywords

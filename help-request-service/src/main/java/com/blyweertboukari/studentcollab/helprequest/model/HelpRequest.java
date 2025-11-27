@@ -8,7 +8,6 @@ import org.hibernate.proxy.HibernateProxy;
 
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -49,7 +48,7 @@ public class HelpRequest {
     private Status status = Status.WAITING;
 
     @Column(nullable = false)
-    private Date desiredDate;
+    private Instant desiredDate;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "help_request_keywords", joinColumns = @JoinColumn(name = "help_request_id"))

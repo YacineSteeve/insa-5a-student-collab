@@ -7,7 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 
 @Data
@@ -21,8 +21,8 @@ public class HelpRequestsFilters {
     private List<HelpRequest.Status> statuses;
 
     @Valid
-    private Date desiredDateFrom;
+    private Instant desiredDateFrom;
 
     @Valid
-    private Date desiredDateTo;
+    private Instant desiredDateTo;
 }

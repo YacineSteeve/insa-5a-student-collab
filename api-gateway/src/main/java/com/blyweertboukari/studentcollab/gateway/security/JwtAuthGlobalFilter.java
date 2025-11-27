@@ -54,7 +54,17 @@ public class JwtAuthGlobalFilter implements GlobalFilter, Ordered {
 
             String email = claims.getSubject();
             Object idObj = claims.get("id");
-            String userId = idObj != null ? String.valueOf(idObj) : null;
+            String userId = null;
+
+            if (idObj instanceof Integer) {
+                userId = String.valueOf((int) idObj);
+            } else if (idObj instanceof Long) {
+                userId = String.valueOf((long) idObj);
+            } else if (idObj instanceof Double) {
+                userId = String.valueOf(((Double) idObj).longValue());
+            } else if (idObj instanceof String) {
+                userId = (String) idObj;
+            }
 
             ServerHttpRequest.Builder requestBuilder = exchange.getRequest().mutate();
             if (email != null) {

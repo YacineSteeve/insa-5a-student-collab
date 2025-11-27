@@ -24,7 +24,7 @@ public class HelpRequestController {
     private HelpRequestService helpRequestService;
 
     @GetMapping
-    @Operation(summary = "Get All Help Requests")
+    @Operation(summary = "Get all help requests")
     public ResponseEntity<List<HelpRequestDTO>> getAllHelpRequests(
             @Valid @ModelAttribute HelpRequestsFilters filters
     ) {
@@ -33,7 +33,7 @@ public class HelpRequestController {
     }
 
     @GetMapping("/{helpRequestId}")
-    @Operation(summary = "Get Help Request By ID")
+    @Operation(summary = "Get help request by ID")
     public ResponseEntity<HelpRequestDTO> getHelpRequest(@PathVariable Long helpRequestId) {
         try {
             HelpRequestDTO helpRequest = helpRequestService.getHelpRequestById(helpRequestId);
@@ -43,8 +43,8 @@ public class HelpRequestController {
         }
     }
 
-    @GetMapping("/me")
-    @Operation(summary = "Get Help Requests For Authenticated User")
+    @GetMapping("/by-me")
+    @Operation(summary = "Get help requests authored by authenticated user")
     public ResponseEntity<List<HelpRequestDTO>> getHelpRequestsForAuthenticatedUser(
             @RequestHeader(value = "X-User-Id", required = false) String userId,
             @Valid @ModelAttribute HelpRequestsFilters filters
@@ -60,8 +60,26 @@ public class HelpRequestController {
         }
     }
 
+    @GetMapping("/for-me")
+    @Operation(summary = "Get help requests assigned to authenticated user")
+    public ResponseEntity<List<HelpRequestDTO>> getHelpRequestsAssignedToAuthenticatedUser(
+            @RequestHeader(value = "X-User-Id", required = false) String userId,
+            @Valid @ModelAttribute HelpRequestsFilters filters
+    ) {
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        try {
+            List<HelpRequestDTO> helpRequests = helpRequestService.getHelpRequestsAssignedToUser(Long.parseLong(userId), filters);
+            return ResponseEntity.ok(helpRequests);
+        } catch (NumberFormatException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+    }
+
     @PostMapping
-    @Operation(summary = "Create Help Request")
+    @Operation(summary = "Create help request")
     public ResponseEntity<HelpRequestDTO> createHelpRequest(
             @RequestHeader(value = "X-User-Id", required = false) String userId,
             @Valid @RequestBody HelpRequestCreationDTO helpRequestCreationDTO
@@ -82,7 +100,7 @@ public class HelpRequestController {
     }
 
     @PatchMapping("/{helpRequestId}")
-    @Operation(summary = "Update Help Request By ID")
+    @Operation(summary = "Update help request by ID")
     public ResponseEntity<HelpRequestDTO> updateHelpRequest(
             @RequestHeader(value = "X-User-Id", required = false) String userId,
             @PathVariable Long helpRequestId,
@@ -102,8 +120,31 @@ public class HelpRequestController {
         }
     }
 
+    @PatchMapping("/{helpRequestId}/assignee")
+    @Operation(summary = "Change help request assignee")
+    public ResponseEntity<HelpRequestDTO> removeAssignee(
+            @RequestHeader(value = "X-User-Id", required = false) String userId,
+            @PathVariable Long helpRequestId,
+            @RequestParam Long assigneeId
+    ) {
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        try {
+            HelpRequestDTO helpRequest = helpRequestService.changeHelpRequestAssignee(Long.parseLong(userId), helpRequestId, assigneeId);
+            return ResponseEntity.ok(helpRequest);
+        } catch (NotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (NumberFormatException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
     @DeleteMapping("/{helpRequestId}")
-    @Operation(summary = "Delete Help Request By ID")
+    @Operation(summary = "Delete help request by ID")
     public ResponseEntity<Void> deleteHelpRequest(
             @RequestHeader(value = "X-User-Id", required = false) String userId,
             @PathVariable Long helpRequestId

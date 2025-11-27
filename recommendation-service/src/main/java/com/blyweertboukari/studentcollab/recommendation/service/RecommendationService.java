@@ -3,6 +3,7 @@ package com.blyweertboukari.studentcollab.recommendation.service;
 import com.blyweertboukari.studentcollab.recommendation.dto.HelpRequestDTO;
 import com.blyweertboukari.studentcollab.recommendation.dto.RecommendationDTO;
 import com.blyweertboukari.studentcollab.recommendation.dto.StudentDTO;
+import com.blyweertboukari.studentcollab.recommendation.exceptions.ForbiddenException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,8 +20,13 @@ public class RecommendationService {
     @Autowired
     private HelpRequestService helpRequestService;
 
-    public List<RecommendationDTO> recommendStudentsForHelpRequest(Long helpRequestId) {
+    public List<RecommendationDTO> recommendStudentsForHelpRequest(Long userId, Long helpRequestId) {
         HelpRequestDTO helpRequest = helpRequestService.getHelpRequestById(helpRequestId);
+
+        if (!helpRequest.getAuthorId().equals(userId)) {
+            throw new ForbiddenException("You are not allowed to get recommendations for this help request");
+        }
+
         List<StudentDTO> allStudents = studentService.getAllStudents();
 
         List<RecommendationDTO> recommendations = new ArrayList<>();

@@ -1,4 +1,4 @@
-package com.blyweertboukari.studentcollab.recommendation.config;
+package com.blyweertboukari.studentcollab.student.config;
 
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;

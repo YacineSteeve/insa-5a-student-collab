@@ -81,7 +81,7 @@ public class HelpRequestController {
         }
     }
 
-    @PutMapping("/{helpRequestId}")
+    @PatchMapping("/{helpRequestId}")
     @Operation(summary = "Update Help Request By ID")
     public ResponseEntity<HelpRequestDTO> updateHelpRequest(
             @RequestHeader(value = "X-User-Id", required = false) String userId,

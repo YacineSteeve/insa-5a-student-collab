@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Data
@@ -22,6 +21,6 @@ public class HelpRequestDTO {
     private List<String> keywords = new ArrayList<>();
     private Instant createdAt;
     private Instant updatedAt;
-    private Date desiredDate;
+    private Instant desiredDate;
     private HelpRequest.Status status;
 }

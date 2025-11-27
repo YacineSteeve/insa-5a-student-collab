@@ -4,8 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Data
@@ -16,7 +16,7 @@ public class HelpRequestUpdateDTO {
 
     private String description;
 
-    private Date desiredDate;
+    private Instant desiredDate;
 
     private List<String> keywords = new ArrayList<>();
 }

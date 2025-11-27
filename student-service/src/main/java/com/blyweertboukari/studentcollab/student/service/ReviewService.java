@@ -35,11 +35,18 @@ public class ReviewService {
         return toDTO(review);
     }
 
-    public List<ReviewDTO> getAllForStudent(Long studentId) {
+    public List<ReviewDTO> getAllForStudent(Long studentId, Long helpRequestId) {
         Student student = studentRepository.findById(studentId)
                 .orElseThrow(() -> new NotFoundException("Student not found"));
 
-        return reviewRepository.allReviewsByStudentId(student.getId())
+        if (helpRequestId != null) {
+            return reviewRepository.findAllByStudentIdAndHelpRequestId(student.getId(), helpRequestId)
+                    .stream()
+                    .map(this::toDTO)
+                    .toList();
+        }
+
+        return reviewRepository.findAllByStudentId(student.getId())
                 .stream()
                 .map(this::toDTO)
                 .toList();

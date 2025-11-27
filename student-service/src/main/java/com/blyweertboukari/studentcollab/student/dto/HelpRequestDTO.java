@@ -1,4 +1,4 @@
-package com.blyweertboukari.studentcollab.recommendation.dto;
+package com.blyweertboukari.studentcollab.student.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,11 +14,14 @@ import java.util.List;
 public class HelpRequestDTO {
 
     private Long id;
+    private Long assigneeId;
     private Long authorId;
     private String title;
     private String description;
     private List<String> keywords = new ArrayList<>();
     private Instant createdAt;
+    private Instant updatedAt;
+    private Instant desiredDate;
     private Status status;
 
     public enum Status {

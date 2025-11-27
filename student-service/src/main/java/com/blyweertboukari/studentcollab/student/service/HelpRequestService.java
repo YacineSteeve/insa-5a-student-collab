@@ -1,6 +1,6 @@
-package com.blyweertboukari.studentcollab.recommendation.service;
+package com.blyweertboukari.studentcollab.student.service;
 
-import com.blyweertboukari.studentcollab.recommendation.dto.HelpRequestDTO;
+import com.blyweertboukari.studentcollab.student.dto.HelpRequestDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;

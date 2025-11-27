@@ -46,7 +46,6 @@ public class JwtAuthGlobalFilter implements GlobalFilter, Ordered {
             final String token = authHeader.substring(7);
             Claims claims = jwtService.extractAllClaims(token);
 
-            // Optional: basic expiration check
             if (jwtService.isTokenExpired(token)) {
                 exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
                 return exchange.getResponse().setComplete();
@@ -83,7 +82,6 @@ public class JwtAuthGlobalFilter implements GlobalFilter, Ordered {
 
     @Override
     public int getOrder() {
-        // Run early in the filter chain
         return -100;
     }
 }

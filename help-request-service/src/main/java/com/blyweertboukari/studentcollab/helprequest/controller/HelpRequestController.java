@@ -2,6 +2,7 @@ package com.blyweertboukari.studentcollab.helprequest.controller;
 
 import com.blyweertboukari.studentcollab.helprequest.dto.HelpRequestCreationDTO;
 import com.blyweertboukari.studentcollab.helprequest.dto.HelpRequestDTO;
+import com.blyweertboukari.studentcollab.helprequest.dto.HelpRequestUpdateDTO;
 import com.blyweertboukari.studentcollab.helprequest.dto.HelpRequestsFilters;
 import com.blyweertboukari.studentcollab.helprequest.exceptions.NotFoundException;
 import com.blyweertboukari.studentcollab.helprequest.service.HelpRequestService;
@@ -52,8 +53,7 @@ public class HelpRequestController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         try {
-            long authorId = Long.parseLong(userId);
-            List<HelpRequestDTO> helpRequests = helpRequestService.getHelpRequestsForUser(authorId, filters);
+            List<HelpRequestDTO> helpRequests = helpRequestService.getHelpRequestsForUser(Long.parseLong(userId), filters);
             return ResponseEntity.ok(helpRequests);
         } catch (NumberFormatException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
@@ -70,8 +70,7 @@ public class HelpRequestController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         try {
-            long authorId = Long.parseLong(userId);
-            HelpRequestDTO helpRequest = helpRequestService.createHelpRequest(authorId, helpRequestCreationDTO);
+            HelpRequestDTO helpRequest = helpRequestService.createHelpRequest(Long.parseLong(userId), helpRequestCreationDTO);
             return ResponseEntity.status(HttpStatus.CREATED).body(helpRequest);
         } catch (NotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -87,15 +86,14 @@ public class HelpRequestController {
     public ResponseEntity<HelpRequestDTO> updateHelpRequest(
             @RequestHeader(value = "X-User-Id", required = false) String userId,
             @PathVariable Long helpRequestId,
-            @Valid @RequestBody HelpRequestCreationDTO helpRequestCreationDTO
+            @Valid @RequestBody HelpRequestUpdateDTO helpRequestUpdateDTO
     ) {
         if (userId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
         try {
-            Long authorId = Long.parseLong(userId);
-            HelpRequestDTO helpRequest = helpRequestService.updateHelpRequest(authorId, helpRequestId, helpRequestCreationDTO);
+            HelpRequestDTO helpRequest = helpRequestService.updateHelpRequest(Long.parseLong(userId), helpRequestId, helpRequestUpdateDTO);
             return ResponseEntity.ok(helpRequest);
         } catch (NotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -115,8 +113,7 @@ public class HelpRequestController {
         }
 
         try {
-            Long authorId = Long.parseLong(userId);
-            helpRequestService.deleteHelpRequest(authorId, helpRequestId);
+            helpRequestService.deleteHelpRequest(Long.parseLong(userId), helpRequestId);
             return ResponseEntity.noContent().build();
         } catch (NotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();

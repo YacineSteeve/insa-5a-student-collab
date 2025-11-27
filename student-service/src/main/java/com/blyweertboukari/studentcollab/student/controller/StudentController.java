@@ -44,14 +44,13 @@ public class StudentController {
 
     @GetMapping("/me")
     @Operation(summary = "Get authenticated Student")
-    public ResponseEntity<StudentDTO> authenticatedStudent(@RequestHeader(value = "X-User-Id", required = false) String userId) {
-        try {
-            if (userId == null) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-            }
-            long id = Long.parseLong(userId);
-            StudentDTO student = studentService.getStudentById(id);
+    public ResponseEntity<StudentDTO> getAuthenticatedStudent(@RequestHeader(value = "X-User-Id", required = false) String userId) {
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
 
+        try {
+            StudentDTO student = studentService.getStudentById(Long.parseLong(userId));
             return ResponseEntity.ok(student);
         } catch (NotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -62,17 +61,18 @@ public class StudentController {
         }
     }
 
-    @PutMapping("/me")
+    @PatchMapping("/me")
     @Operation(summary = "Update authenticated student profile")
-    public ResponseEntity<StudentDTO> updateStudent(@RequestHeader(value = "X-User-Id", required = false) String userId,
-                                                    @Valid @RequestBody StudentUpdateDTO studentUpdateDTO) {
-        try {
-            if (userId == null) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-            }
-            long id = Long.parseLong(userId);
-            StudentDTO updatedStudent = studentService.updateStudent(id, studentUpdateDTO);
+    public ResponseEntity<StudentDTO> updateStudent(
+            @RequestHeader(value = "X-User-Id", required = false) String userId,
+            @Valid @RequestBody StudentUpdateDTO studentUpdateDTO
+    ) {
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
 
+        try {
+            StudentDTO updatedStudent = studentService.updateStudent(Long.parseLong(userId), studentUpdateDTO);
             return ResponseEntity.ok(updatedStudent);
         } catch (NotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -86,13 +86,12 @@ public class StudentController {
     @DeleteMapping("/me")
     @Operation(summary = "Delete authenticated student")
     public ResponseEntity<Void> deleteStudent(@RequestHeader(value = "X-User-Id", required = false) String userId) {
-        try {
-            if (userId == null) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-            }
-            long id = Long.parseLong(userId);
-            studentService.deleteStudent(id);
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
 
+        try {
+            studentService.deleteStudent(Long.parseLong(userId));
             return ResponseEntity.noContent().build();
         } catch (NotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();

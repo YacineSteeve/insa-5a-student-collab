@@ -2,8 +2,8 @@ package com.blyweertboukari.studentcollab.helprequest.controller;
 
 import com.blyweertboukari.studentcollab.helprequest.dto.HelpRequestCreationDTO;
 import com.blyweertboukari.studentcollab.helprequest.dto.HelpRequestDTO;
+import com.blyweertboukari.studentcollab.helprequest.dto.HelpRequestsFilters;
 import com.blyweertboukari.studentcollab.helprequest.exceptions.NotFoundException;
-import com.blyweertboukari.studentcollab.helprequest.model.HelpRequest;
 import com.blyweertboukari.studentcollab.helprequest.service.HelpRequestService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -22,75 +22,106 @@ public class HelpRequestController {
     @Autowired
     private HelpRequestService helpRequestService;
 
-    @PostMapping
-    @Operation(summary = "Create Help Request")
-    public ResponseEntity<HelpRequestDTO> createHelpRequest(@Valid @RequestBody HelpRequestCreationDTO dto) {
-        try {
-            HelpRequestDTO helpRequest = helpRequestService.createHelpRequest(dto);
-            return ResponseEntity.status(HttpStatus.CREATED).body(helpRequest);
-        } catch (NotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-    }
-
-    @GetMapping("/{id}")
-    @Operation(summary = "Get Help Request By ID")
-    public ResponseEntity<HelpRequestDTO> getHelpRequest(@PathVariable Long id) {
-        try {
-            HelpRequestDTO helpRequest = helpRequestService.getHelpRequestById(id);
-            return ResponseEntity.ok(helpRequest);
-        } catch (NotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-    }
-
-    @PutMapping("/{id}")
-    @Operation(summary = "Update Help Request By ID")
-    public ResponseEntity<HelpRequestDTO> updateHelpRequest(@PathVariable Long id, @Valid @RequestBody HelpRequestCreationDTO dto) {
-        try {
-            HelpRequestDTO helpRequest = helpRequestService.updateHelpRequest(id, dto);
-            return ResponseEntity.ok(helpRequest);
-        } catch (NotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-    }
-
-    @DeleteMapping("/{id}")
-    @Operation(summary = "Delete Help Request By ID")
-    public ResponseEntity<Void> deleteHelpRequest(@PathVariable Long id) {
-        try {
-            helpRequestService.deleteHelpRequest(id);
-            return ResponseEntity.noContent().build();
-        } catch (NotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-    }
-
     @GetMapping
     @Operation(summary = "Get All Help Requests")
-    public ResponseEntity<List<HelpRequestDTO>> getAllHelpRequests() {
-        List<HelpRequestDTO> helpRequests = helpRequestService.getAllHelpRequests();
+    public ResponseEntity<List<HelpRequestDTO>> getAllHelpRequests(
+            @Valid @ModelAttribute HelpRequestsFilters filters
+    ) {
+        List<HelpRequestDTO> helpRequests = helpRequestService.getAllHelpRequests(filters);
         return ResponseEntity.ok(helpRequests);
+    }
+
+    @GetMapping("/{helpRequestId}")
+    @Operation(summary = "Get Help Request By ID")
+    public ResponseEntity<HelpRequestDTO> getHelpRequest(@PathVariable Long helpRequestId) {
+        try {
+            HelpRequestDTO helpRequest = helpRequestService.getHelpRequestById(helpRequestId);
+            return ResponseEntity.ok(helpRequest);
+        } catch (NotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
 
     @GetMapping("/me")
-    @Operation(summary = "Get Help Request For Authenticated User")
-    public ResponseEntity<List<HelpRequestDTO>> getHelpRequestsForAuthenticatedUser() {
-        List<HelpRequestDTO> helpRequests = helpRequestService.getHelpRequestsForAuthenticatedUser();
-        return ResponseEntity.ok(helpRequests);
+    @Operation(summary = "Get Help Requests For Authenticated User")
+    public ResponseEntity<List<HelpRequestDTO>> getHelpRequestsForAuthenticatedUser(
+            @RequestHeader(value = "X-User-Id", required = false) String userId,
+            @Valid @ModelAttribute HelpRequestsFilters filters
+    ) {
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        try {
+            long authorId = Long.parseLong(userId);
+            List<HelpRequestDTO> helpRequests = helpRequestService.getHelpRequestsForUser(authorId, filters);
+            return ResponseEntity.ok(helpRequests);
+        } catch (NumberFormatException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
     }
 
-    @GetMapping("/status/{status}")
-    @Operation(summary = "Get Help Requests By Status")
-    public ResponseEntity<List<HelpRequestDTO>> getHelpRequestsByStatus(@PathVariable HelpRequest.Status status) {
-        List<HelpRequestDTO> helpRequests = helpRequestService.getHelpRequestsByStatus(status);
-        return ResponseEntity.ok(helpRequests);
+    @PostMapping
+    @Operation(summary = "Create Help Request")
+    public ResponseEntity<HelpRequestDTO> createHelpRequest(
+            @RequestHeader(value = "X-User-Id", required = false) String userId,
+            @Valid @RequestBody HelpRequestCreationDTO helpRequestCreationDTO
+    ) {
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        try {
+            long authorId = Long.parseLong(userId);
+            HelpRequestDTO helpRequest = helpRequestService.createHelpRequest(authorId, helpRequestCreationDTO);
+            return ResponseEntity.status(HttpStatus.CREATED).body(helpRequest);
+        } catch (NotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (NumberFormatException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
-    @GetMapping("/keyword/{keyword}")
-    @Operation(summary = "Get Help Requests By Keyword")
-    public ResponseEntity<List<HelpRequestDTO>> getHelpRequestsByKeyword(@PathVariable String keyword) {
-        List<HelpRequestDTO> helpRequests = helpRequestService.getHelpRequestsByKeyword(keyword);
-        return ResponseEntity.ok(helpRequests);
+    @PutMapping("/{helpRequestId}")
+    @Operation(summary = "Update Help Request By ID")
+    public ResponseEntity<HelpRequestDTO> updateHelpRequest(
+            @RequestHeader(value = "X-User-Id", required = false) String userId,
+            @PathVariable Long helpRequestId,
+            @Valid @RequestBody HelpRequestCreationDTO helpRequestCreationDTO
+    ) {
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        try {
+            Long authorId = Long.parseLong(userId);
+            HelpRequestDTO helpRequest = helpRequestService.updateHelpRequest(authorId, helpRequestId, helpRequestCreationDTO);
+            return ResponseEntity.ok(helpRequest);
+        } catch (NotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (NumberFormatException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+    }
+
+    @DeleteMapping("/{helpRequestId}")
+    @Operation(summary = "Delete Help Request By ID")
+    public ResponseEntity<Void> deleteHelpRequest(
+            @RequestHeader(value = "X-User-Id", required = false) String userId,
+            @PathVariable Long helpRequestId
+    ) {
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        try {
+            Long authorId = Long.parseLong(userId);
+            helpRequestService.deleteHelpRequest(authorId, helpRequestId);
+            return ResponseEntity.noContent().build();
+        } catch (NotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (NumberFormatException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
     }
 }

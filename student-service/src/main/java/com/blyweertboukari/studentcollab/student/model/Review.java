@@ -44,6 +44,9 @@ public class Review {
     @Column(length = 1000)
     private String comment;
 
+    @Column(nullable = false)
+    private Long helpRequestId;
+
     @Override
     public final boolean equals(Object o) {
         if (this == o) return true;

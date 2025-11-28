@@ -32,6 +32,8 @@ public class ReviewService {
         review.setRating(dto.getRating());
         review.setHelpRequestId(dto.getHelpRequestId());
 
+        review = reviewRepository.save(review);
+
         return toDTO(review);
     }
 
